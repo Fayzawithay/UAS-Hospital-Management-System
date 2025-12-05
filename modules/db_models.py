@@ -46,6 +46,8 @@ class DoctorDB(Base):
     phone = Column(String(50), nullable=False)
     is_available = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    email = Column(String(255), nullable=False)
+    password = Column(String(255), nullable=False)
 
 
 # ================= QUEUE (ANTRIAN) =================
