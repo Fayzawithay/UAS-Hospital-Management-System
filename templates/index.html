@@ -543,111 +543,226 @@ Belum ada request.
             </div>
         </div>
 
-        <!-- ===== Klinik & Dokter ===== -->
-        <div class="col-lg-4">
-            <!-- Klinik -->
-            <div class="card card-step mb-4">
+       <!-- ==================== KLINIK & DOKTER ==================== -->
+<div class="col-lg-6">
+
+    <!-- ===================== KLINIK ===================== -->
+    <div class="card card-step mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>2. Klinik</span>
+            <button id="btnLoadClinics" class="btn btn-sm btn-outline-primary">Muat Klinik</button>
+        </div>
+
+        <div class="card-body">
+            <form id="clinic-form" class="mb-3">
+                <h6 class="mb-2">Buat Klinik</h6>
+
+                <label class="form-label">Nama Klinik</label>
+                <input type="text" class="form-control mb-2" id="clinicName" placeholder="Klinik Umum" required>
+
+                <label class="form-label">Deskripsi</label>
+                <input type="text" class="form-control mb-3" id="clinicDesc" placeholder="Deskripsi singkat">
+
+                <button class="btn btn-success w-100">Simpan Klinik</button>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Klinik</th>
+                    </tr>
+                    </thead>
+                    <tbody id="clinicTableBody">
+                    <tr>
+                        <td colspan="2" class="text-muted text-center py-3">
+                            Belum ada data. Klik <strong>Muat Klinik</strong>.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <small class="text-muted d-block mt-2">
+                Gunakan <strong>clinic_id</strong> untuk menambahkan dokter.
+            </small>
+        </div>
+    </div>
+
+
+    <!-- ===================== DOKTER ===================== -->
+    <div class="card card-step">
+        <div class="card-header">
+            <span>3. Dokter</span>
+        </div>
+
+        <div class="card-body">
+            <form id="doctor-form">
+                <h6 class="mb-2">Tambah Dokter</h6>
+
+                <!-- Dropdown Klinik -->
+                <label class="form-label">Klinik</label>
+                <select class="form-control mb-3" id="docClinicSelect">
+                    <option value="">-- pilih klinik --</option>
+                </select>
+
+                <label class="form-label">Nama Dokter</label>
+                <input type="text" class="form-control mb-2" id="docName" placeholder="Dr. Andi" required>
+
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control mb-2" id="docEmail" placeholder="dokter@example.com" required>
+
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control mb-2" id="docPassword" placeholder="Password" required>
+
+                <label class="form-label">No. HP</label>
+                <input type="text" class="form-control mb-3" id="docPhone" placeholder="08xxxx" required>
+
+                <label class="form-label">Spesialisasi</label>
+                <input type="text" class="form-control mb-3" id="docSpec" placeholder="Umum / Anak / lainnya" required>
+
+                <button class="btn btn-warning w-100">Simpan Dokter</button>
+            </form>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Dokter</th>
+                        <th>Klinik</th>
+                    </tr>
+                    </thead>
+                    <tbody id="doctorTableBody">
+                    <tr>
+                        <td colspan="3" class="text-muted text-center py-3">
+                            Belum ada data dokter.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+            <!-- Daftar Antrean Pasien -->
+            <div class="card card-step">
                 <div class="card-header">
-                    <span>2. Klinik</span>
-                    <button id="btnLoadClinics" class="btn btn-sm btn-outline-primary">
-                        Muat Klinik
-                    </button>
+                    <span>5. Pasien – Daftar Antrean</span>
+                    <small>Butuh login pasien</small>
                 </div>
                 <div class="card-body">
-                    <form id="clinic-form" class="mb-3">
-                        <h6 class="mb-2">Buat Klinik</h6>
+                    <form id="queue-register-form" class="mb-3">
                         <div class="mb-2">
-                            <label class="form-label">Nama Klinik</label>
-                            <input type="text" class="form-control" id="clinicName"
-                                   placeholder="Klinik Umum" required>
+                            <label class="form-label">clinic_id</label>
+                            <input type="text" class="form-control" id="queueClinicId"
+                                   placeholder="clinic-001" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Deskripsi</label>
-                            <input type="text" class="form-control" id="clinicDesc"
-                                   placeholder="Deskripsi singkat">
+                            <label class="form-label">doctor_id</label>
+                            <input type="text" class="form-control" id="queueDoctorId"
+                                   placeholder="doctor-001" required>
                         </div>
                         <button type="submit" class="btn btn-success w-100">
-                            Simpan Klinik
+                            Daftar Antrean (POST /api/queues/register)
                         </button>
                     </form>
 
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0 align-middle">
-                            <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nama Klinik</th>
-                            </tr>
-                            </thead>
-                            <tbody id="clinicTableBody">
-                            <tr>
-                                <td colspan="2" class="text-muted text-center py-3">
-                                    Belum ada data.
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <small class="text-muted d-block mt-2">
-                        <strong>clinic_id</strong> dipakai saat membuat dokter & antrean.
+                    <small class="text-muted">
+                        Simpan <strong>queue.id</strong> dari respons untuk dipakai
+                        dokter di bagian B.
                     </small>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Dokter -->
-            <div class="card card-step">
+     <!-- Complete & Call Queue -->
+        <div class="col-lg-8">
+            <div class="card card-step mb-4">
                 <div class="card-header">
-                    <span>3. Dokter (Register User + Profil)</span>
-                    <small>Hanya Admin</small>
+                    <span>7. Selesaikan Antrean (Panggil + Complete)</span>
+                    <span class="badge rounded-pill text-bg-success-subtle text-success">
+                        Data ala Kaggle
+                    </span>
                 </div>
                 <div class="card-body">
-                    <form id="doctor-register-form" class="mb-1">
-                        <h6 class="mb-2">Register Akun Dokter</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="docName"
-                                   placeholder="Dr. Andi" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="docEmail"
-                                   placeholder="dokter@example.com" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="docPassword"
-                                   placeholder="Password dokter" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">No. HP</label>
-                            <input type="text" class="form-control" id="docPhone"
-                                   placeholder="No. HP dokter" required>
-                        </div>
-
-                        <h6 class="mt-1 mb-2">Data Dokter (Profil)</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Spesialisasi</label>
-                            <input type="text" class="form-control" id="docSpec"
-                                   placeholder="Umum / Anak / dll" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">clinic_id</label>
-                            <input type="text" class="form-control" id="docClinicId"
-                                   placeholder="clinic-001" required>
+                    <form id="complete-queue-form" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Queue ID</label>
+                            <input type="text" class="form-control" id="queueId"
+                                   placeholder="klik antrean di tabel atau isi manual" required>
                             <div class="form-text">
-                                Ambil dari tabel klinik di atas.
+                                Dipilih dari tabel antrean di bawah atau dari respons pasien.
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-warning w-100">
-                            Register Dokter + Simpan Profil
-                        </button>
+                        <div class="col-md-6">
+                            <label class="form-label">Keluhan / Alasan Kunjungan</label>
+                            <input type="text" class="form-control" id="reason"
+                                   value="Demam dan batuk" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Jumlah Pembayaran</label>
+                            <input type="number" class="form-control" id="paymentAmount"
+                                   value="200000" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Metode Pembayaran</label>
+                            <select class="form-control" id="modeOfPayment" required>
+                                <option value="Transfer">Transfer</option>
+                                <option value="Cash" selected>Cash</option>
+                                <option value="Qris">QRIS</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Jenis Kunjungan</label>
+                            <select class="form-control" id="modeOfAppointment" required>
+                                <option value="In Person" selected>Tatap Muka (In Person)</option>
+                                <option value="Telepon">Telepon</option>
+                                <option value="Online">Online / Video Call</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 d-flex flex-wrap gap-2 mt-1">
+                            <button type="button" id="btnCallQueue" class="btn btn-outline-primary">
+                                Panggil Antrean (ubah ke IN_SERVICE)
+                            </button>
+
+                            <button type="submit" class="btn btn-success">
+                                Selesaikan Antrean dengan Data Kaggle
+                            </button>
+
+                            <button type="button" id="btnResetForm" class="btn btn-outline-secondary">
+                                Reset Formulir
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
-        </div>
 
-        <!-- ===== Pasien & Antrean ===== -->
+    
+
+<!-- ================== SECTION B: PASIEN ( REGISTER + DAFTAR ) ================== -->
+
+ <hr class="my-4">
+<div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+    <h3 class="mb-0 section-heading">
+        B. Pasien – Registrasi & Pengelolaan Antrean
+    </h3>
+    <span class="badge rounded-pill text-bg-primary-subtle text-primary px-3 py-2" style="font-size:.75rem;">
+        Login → Pilih Klinik → Daftar Antrean → Cek Status
+    </span>
+</div>
+
+
+ <!-- ===== Pasien & Antrean ===== -->
         <div class="col-lg-4">
             <!-- Pasien -->
             <div class="card card-step mb-4">
@@ -745,8 +860,49 @@ Belum ada request.
             </div>
         </div>
     </div>
+<!-- Pasien – Cek Status Antrean -->
+<div class="card card-step mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>6. Pasien – Cek Status Antrean</span>
+        <button id="btnCheckQueue" class="btn btn-sm btn-outline-secondary">
+            Cek Antrean
+        </button>
+    </div>
 
-    <!-- ================== SECTION B: DOKTER (CALL + COMPLETE) ================== -->
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">Masukkan Queue ID</label>
+            <input type="text" class="form-control" id="queueCheckInput"
+                   placeholder="queue-001">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Queue ID</th>
+                    <th>No. Antrean</th>
+                    <th>Status</th>
+                    <th>Dokter</th>
+                    <th>Klinik</th>
+                </tr>
+                </thead>
+                <tbody id="queueCheckTableBody">
+                <tr>
+                    <td colspan="5" class="text-muted text-center py-3">
+                        Masukkan Queue ID lalu klik <strong>Cek Antrean</strong>.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- ================== SECTION C: DOKTER (CALL + COMPLETE) ================== -->
     <hr class="my-4">
     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
         <h3 class="mb-0 section-heading">
@@ -757,6 +913,58 @@ Belum ada request.
         </span>
     </div>
 
+      <!-- Dokter -->
+            <div class="card card-step">
+                <div class="card-header">
+                    <span>3. Dokter (Register User + Profil)</span>
+                    <small>Hanya Admin</small>
+                </div>
+                <div class="card-body">
+                    <form id="doctor-register-form" class="mb-1">
+                        <h6 class="mb-2">Register Akun Dokter</h6>
+                        <div class="mb-2">
+                            <label class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="docName"
+                                   placeholder="Dr. Andi" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="docEmail"
+                                   placeholder="dokter@example.com" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Kata Sandi</label>
+                            <input type="password" class="form-control" id="docPassword"
+                                   placeholder="Password dokter" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">No. HP</label>
+                            <input type="text" class="form-control" id="docPhone"
+                                   placeholder="No. HP dokter" required>
+                        </div>
+
+                        <h6 class="mt-1 mb-2">Data Dokter (Profil)</h6>
+                        <div class="mb-2">
+                            <label class="form-label">Spesialisasi</label>
+                            <input type="text" class="form-control" id="docSpec"
+                                   placeholder="Umum / Anak / dll" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">clinic_id</label>
+                            <input type="text" class="form-control" id="docClinicId"
+                                   placeholder="clinic-001" required>
+                            <div class="form-text">
+                                Ambil dari tabel klinik di atas.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100">
+                            Register Dokter + Simpan Profil
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     <div class="row g-4">
         <div class="col-lg-4">
             <!-- Login Dokter -->
@@ -916,6 +1124,16 @@ Belum ada request.
             : JSON.stringify(data, null, 2);
     }
 
+
+
+
+
+
+
+
+
+
+
     // ======================= ADMIN =======================
 
     document.getElementById("admin-register-form")
@@ -1015,6 +1233,158 @@ Belum ada request.
                 setApiResponse("Error koneksi (buat klinik)");
             }
         });
+
+async function loadClinics() {
+    const res = await fetch(`${BASE_URL}/api/clinics/all`);
+    const data = await res.json();
+
+    const clinicTable = document.getElementById("clinicTableBody");
+    const selectClinic = document.getElementById("docClinicSelect");
+
+    clinicTable.innerHTML = "";
+    selectClinic.innerHTML = `<option value="">-- pilih klinik --</option>`;
+
+    data.forEach(c => {
+        clinicTable.innerHTML += `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.name}</td>
+            </tr>
+        `;
+
+        selectClinic.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+    });
+}
+
+document.getElementById("clinic-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const body = {
+        name: document.getElementById("clinicName").value,
+        description: document.getElementById("clinicDesc").value
+    };
+
+    const res = await fetch(`${BASE_URL}/api/clinics/create`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    await res.json();
+    loadClinics();
+});
+
+document.getElementById("doctor-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const body = {
+        name: document.getElementById("docName").value,
+        email: document.getElementById("docEmail").value,
+        password: document.getElementById("docPassword").value,
+        phone: document.getElementById("docPhone").value,
+        specialization: document.getElementById("docSpec").value,
+        clinic_id: document.getElementById("docClinicSelect").value
+    };
+
+    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${adminToken}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    await res.json();
+    loadDoctors();
+});
+
+async function loadDoctors() {
+    const res = await fetch(`${BASE_URL}/api/doctors/all`);
+    const data = await res.json();
+
+    const tbody = document.getElementById("doctorTableBody");
+    tbody.innerHTML = "";
+
+    data.forEach(d => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${d.id}</td>
+                <td>${d.name}</td>
+                <td>${d.clinic_name}</td>
+            </tr>
+        `;
+    });
+}
+
+// ===================== LOAD KLINIK =====================
+document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
+
+async function loadClinics() {
+    const res = await fetch(`${BASE_URL}/api/clinics/all`);
+    const clinics = await res.json();
+
+    const tableBody = document.getElementById("clinicTableBody");
+    const clinicSelect = document.getElementById("docClinicSelect");
+
+    tableBody.innerHTML = "";
+    clinicSelect.innerHTML = `<option value="">-- pilih klinik --</option>`;
+
+    clinics.forEach(c => {
+        // Tabel Klinik
+        tableBody.innerHTML += `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.name}</td>
+            </tr>
+        `;
+
+        // Dropdown Dokter
+        clinicSelect.innerHTML += `
+            <option value="${c.id}">${c.name}</option>
+        `;
+    });
+}
+
+
+
+// ===================== SIMPAN DOKTER =====================
+document.getElementById("doctor-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const clinic_id = document.getElementById("docClinicSelect").value;
+
+    const body = {
+        name: document.getElementById("docName").value,
+        email: document.getElementById("docEmail").value,
+        password: document.getElementById("docPassword").value,
+        phone: document.getElementById("docPhone").value,
+        specialization: document.getElementById("docSpec").value,
+        clinic_id: clinic_id
+    };
+
+    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + adminToken
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    setApiResponse(data);
+
+    // Refresh tabel dokter
+    loadDoctors();
+});
+
+
+document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
+
 
     async function loadClinics() {
         const tbody = document.getElementById("clinicTableBody");
@@ -1225,6 +1595,59 @@ Belum ada request.
             }
         });
 
+       // PASIEN – CEK STATUS ANTREAN
+document.getElementById("btnCheckQueue").addEventListener("click", async () => {
+    const qid = document.getElementById("queueCheckInput").value;
+    const tbody = document.getElementById("queueCheckTableBody");
+
+    if (!patientToken) {
+        tbody.innerHTML = `
+            <tr><td colspan="5" class="text-danger text-center py-3">
+                Pasien harus login terlebih dahulu.
+            </td></tr>`;
+        return;
+    }
+
+    if (!qid) {
+        tbody.innerHTML = `
+            <tr><td colspan="5" class="text-warning text-center py-3">
+                Masukkan Queue ID.
+            </td></tr>`;
+        return;
+    }
+
+    const res = await fetch(`${BASE_URL}/api/queues/check/${qid}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${patientToken}`
+        }
+    });
+
+    const data = await res.json();
+
+    // Jika error
+    if (!res.ok) {
+        tbody.innerHTML = `
+            <tr><td colspan="5" class="text-danger text-center py-3">
+                ${data.detail || "Queue tidak ditemukan"}
+            </td></tr>`;
+        return;
+    }
+
+    // Render tabel
+    tbody.innerHTML = `
+        <tr>
+            <td>${data.id}</td>
+            <td>${data.queue_number}</td>
+            <td><span class="badge text-bg-info">${data.status}</span></td>
+            <td>${data.doctor_name || "-"}</td>
+            <td>${data.clinic_name || "-"}</td>
+        </tr>
+    `;
+});
+
+
+
     // ======================= DOKTER – LOGIN =======================
 
     document.getElementById("doctor-login-form")
@@ -1325,6 +1748,90 @@ Belum ada request.
             document.getElementById("complete-queue-form").reset();
         });
 
+
+
+
+        // ===================== LOAD KLINIK =====================
+document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
+
+async function loadClinics() {
+    const res = await fetch(`${BASE_URL}/api/clinics/all`);
+    const clinics = await res.json();
+
+    const tableBody = document.getElementById("clinicTableBody");
+    const clinicSelect = document.getElementById("docClinicSelect");
+
+    tableBody.innerHTML = "";
+    clinicSelect.innerHTML = `<option value="">-- pilih klinik --</option>`;
+
+    clinics.forEach(c => {
+        // Tabel Klinik
+        tableBody.innerHTML += `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.name}</td>
+            </tr>
+        `;
+
+        // Dropdown Dokter
+        clinicSelect.innerHTML += `
+            <option value="${c.id}">${c.name}</option>
+        `;
+    });
+}
+
+// ===================== SIMPAN DOKTER =====================
+document.getElementById("doctor-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const clinic_id = document.getElementById("docClinicSelect").value;
+
+    const body = {
+        name: document.getElementById("docName").value,
+        email: document.getElementById("docEmail").value,
+        password: document.getElementById("docPassword").value,
+        phone: document.getElementById("docPhone").value,
+        specialization: document.getElementById("docSpec").value,
+        clinic_id: clinic_id
+    };
+
+    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + adminToken
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    setApiResponse(data);
+
+    // Refresh tabel dokter
+    loadDoctors();
+});
+
+// ===================== LOAD TABEL DOKTER =====================
+async function loadDoctors() {
+    const res = await fetch(`${BASE_URL}/api/doctors/all`);
+    const doctors = await res.json();
+
+    const table = document.getElementById("doctorTableBody");
+    table.innerHTML = "";
+
+    doctors.forEach(d => {
+        table.innerHTML += `
+            <tr>
+                <td>${d.id}</td>
+                <td>${d.name}</td>
+                <td>${d.clinic_name || d.clinic_id}</td>
+            </tr>
+        `;
+    });
+}
+
+
+
     // ======================= DOKTER – CALL QUEUE =======================
 
     document.getElementById("btnCallQueue")
@@ -1423,6 +1930,8 @@ Belum ada request.
     document.getElementById("btnLoadQueues")
         .addEventListener("click", loadQueues);
 </script>
+
+
 
 </body>
 </html>
