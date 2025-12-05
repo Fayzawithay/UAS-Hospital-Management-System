@@ -2,7 +2,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "mysql+pymysql://root:@localhost:3306/hospital_app"
+# Tanpa password
+DATABASE_URL = "mysql+pymysql://root:@localhost/myhospital"
 # kalau MySQL pakai password:
 # DATABASE_URL = "mysql+pymysql://root:PASSWORD@localhost:3306/hospital_app"
 
