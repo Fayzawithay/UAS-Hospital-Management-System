@@ -39,7 +39,7 @@ class Clinic(BaseModel):
     description: Optional[str] = None
     is_active: bool = True
     created_at: str = Field(
-        default_factory=lambda: datetime.now().isoformat()
+        default_factory=lambda: datetime.now().isoformat()  
     )
 
 
@@ -75,7 +75,7 @@ class Queue(BaseModel):
 
 # =============== VISIT HISTORY (ALA KAGGLE) =================
 class VisitHistory(BaseModel):
-    id: str                # record id
+    id: str         # record id
     queue_id: str
     patient_id: str
     patient_name: str

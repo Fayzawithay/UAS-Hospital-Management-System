@@ -1,4 +1,4 @@
-# deps.py
+# dependency.py
 from database import SessionLocal
 
 def get_db():

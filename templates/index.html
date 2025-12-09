@@ -1,1936 +1,1716 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Antrean Rumah Sakit – Demo Lengkap</title>
+  <meta charset="UTF-8">
+  <title>Antrean Rumah Sakit – Dashboard</title>
 
-    <!-- Bootstrap 5 -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+  <!-- Bootstrap 5 -->
+  <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+  >
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
+  <!-- Icons (Boxicons) -->
+  <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+  >
 
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-soft: #e0edff;
-            --primary-deep: #1d4ed8;
-            --accent: #16a34a;
-            --accent-soft: #dcfce7;
-            --danger-soft: #fee2e2;
-            --warning-soft: #fef3c7;
-            --text-main: #0f172a;
-            --text-muted: #6b7280;
-            --card-bg: #ffffff;
-            --bg-body: #f3f4f6;
-            --border-subtle: #e5e7eb;
-            --shadow-soft: 0 12px 30px rgba(15,23,42,0.06);
-            --shadow-hover: 0 16px 40px rgba(15,23,42,0.08);
-            --radius-card: 0.9rem;
-            --radius-pill: 999px;
-        }
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+  >
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-soft: #e0edff;
+      --primary-deep: #1d4ed8;
+      --accent: #16a34a;
+      --accent-soft: #dcfce7;
+      --danger-soft: #fee2e2;
+      --warning-soft: #fef3c7;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --card-bg: #ffffff;
+      --bg-body: #f3f4f6;
+      --border-subtle: #e5e7eb;
+      --shadow-soft: 0 14px 35px rgba(15,23,42,0.08);
+      --shadow-hover: 0 18px 45px rgba(15,23,42,0.1);
+      --radius-card: 1rem;
+      --radius-pill: 999px;
+      --sidebar-width: 250px;
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background:
-                radial-gradient(circle at top left, rgba(37,99,235,0.06), transparent 55%),
-                radial-gradient(circle at bottom right, rgba(34,197,94,0.04), transparent 55%),
-                var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.5;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+          radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 55%),
+          radial-gradient(circle at bottom right, rgba(34,197,94,0.05), transparent 55%),
+          var(--bg-body);
+      color: var(--text-main);
+    }
 
-        /* NAVBAR */
-        .app-navbar {
-            background-color: #ffffff;
-            border-bottom: 1px solid rgba(15,23,42,0.06);
-            box-shadow: 0 10px 24px rgba(15,23,42,0.05);
-        }
+    /* ===== LAYOUT SHELL ===== */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
 
-        .app-navbar .navbar-brand {
-            font-weight: 600;
-            color: var(--primary-deep) !important;
-            letter-spacing: .02em;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            font-size: 1rem;
-        }
+    /* SIDEBAR */
+    .app-sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
+      color: #e5f0ff;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      box-shadow: 10px 0 35px rgba(15,23,42,0.18);
+      z-index: 20;
+    }
 
-        .app-navbar .navbar-brand span {
-            font-size: .85rem;
-            font-weight: 400;
-            opacity: .9;
-        }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: 1rem;
+      padding: .35rem .5rem;
+      border-radius: .75rem;
+      background: rgba(15,23,42,0.15);
+    }
 
-        .app-navbar .btn-outline-light {
-            border-radius: var(--radius-pill);
-            border-width: 1px;
-            font-size: .8rem;
-            padding-inline: 1rem;
-            background-color: #f9fafb;
-            border-color: var(--border-subtle);
-            color: #111827;
-            backdrop-filter: blur(0);
-            transition: background-color .18s ease-out, color .18s ease-out, box-shadow .18s ease-out, border-color .18s ease-out;
-        }
+    .sidebar-brand-icon {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1rem;
+      background: rgba(15,23,42,0.2);
+      font-size: 1.3rem;
+    }
 
-        .app-navbar .btn-outline-light:hover {
-            background-color: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-            box-shadow: 0 8px 18px rgba(37,99,235,0.3);
-        }
+    .sidebar-brand-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .sidebar-brand-title span:first-child {
+      font-size: .95rem;
+      font-weight: 600;
+    }
+    .sidebar-brand-title span:last-child {
+      font-size: .75rem;
+      opacity: .8;
+    }
 
-        /* PAGE HEADER */
-        .page-header {
-            padding-block: 1.9rem 1.25rem;
-        }
+    .sidebar-menu-title {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 1.2rem 0 .35rem;
+      opacity: .7;
+    }
 
-        .section-label {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            padding: .25rem .75rem;
-            border-radius: var(--radius-pill);
-            font-size: .75rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            background-color: #e0f2fe;
-            color: #0369a1;
-            font-weight: 600;
-        }
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+    }
 
-        .section-label span {
-            width: 6px;
-            height: 6px;
-            border-radius: 999px;
-            background: #0ea5e9;
-        }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .55rem .75rem;
+      border-radius: .8rem;
+      font-size: .85rem;
+      margin-bottom: .25rem;
+      color: #e5f0ff;
+      text-decoration: none;
+      transition: background .18s ease-out, transform .08s ease-out, box-shadow .18s ease-out;
+      cursor: pointer;
+      opacity: .9;
+    }
 
-        .page-title {
-            font-size: 1.9rem;
-            font-weight: 600;
-            margin-top: .75rem;
-            margin-bottom: .4rem;
-        }
+    .sidebar-link i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
 
-        .page-subtitle {
-            font-size: .9rem;
-            color: var(--text-muted);
-            max-width: 640px;
-        }
+    .sidebar-link.active {
+      background: #f9fafb;
+      color: #1f2937;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.35);
+      transform: translateY(-1px);
+    }
 
-        /* LAYOUT */
-        .app-shell {
-            padding-top: 1.75rem;
-            padding-bottom: 3rem;
-        }
+    .sidebar-link:hover:not(.active) {
+      background: rgba(15,23,42,0.18);
+      transform: translateY(-1px);
+    }
 
-        .app-shell hr {
-            border-color: rgba(148,163,184,0.35);
-            margin-block: 2.25rem;
-        }
+    .sidebar-footer {
+      font-size: .75rem;
+      opacity: .7;
+      margin-top: 1rem;
+    }
 
-        h3.section-heading {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+    /* MAIN AREA */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
 
-        /* CARD STEP */
-        .card-step {
-            border-radius: var(--radius-card);
-            border: 1px solid rgba(148,163,184,0.28);
-            background-color: var(--card-bg);
-            box-shadow: var(--shadow-soft);
-            transition: box-shadow .18s ease-out, transform .12s ease-out, border-color .18s ease-out;
-            overflow: hidden;
-        }
+    /* TOPBAR */
+    .app-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .9rem 1.75rem;
+      backdrop-filter: blur(16px);
+      background: rgba(248,250,252,0.92);
+      border-bottom: 1px solid rgba(148,163,184,0.35);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-        .card-step:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(129,140,248,0.4);
-        }
+    .topbar-title {
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar-title span:first-child {
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+    .topbar-title span:last-child {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
 
-        .card-step .card-header {
-            border: none;
-            border-bottom: 1px solid rgba(226,232,240,0.9);
-            border-radius: var(--radius-card) var(--radius-card) 0 0;
-            background: #f9fafb;
-            font-weight: 600;
-            font-size: .9rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: .5rem;
-        }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
 
-        .card-step .card-header small {
-            font-weight: 500;
-            color: var(--text-muted);
-            font-size: .75rem;
-        }
+    .tag-soft {
+      border-radius: var(--radius-pill);
+      padding: .2rem .7rem;
+      background: #e5f0ff;
+      color: #1d4ed8;
+      font-size: .75rem;
+      font-weight: 500;
+    }
 
-        .card-step .card-body {
-            padding: 1.05rem 1.25rem 1.15rem;
-        }
+    .avatar-pill {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      padding: .2rem .65rem;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.12);
+      font-size: .8rem;
+    }
 
-        /* TYPOGRAPHY */
-        label,
-        .form-label {
-            font-size: .8rem;
-            font-weight: 500;
-            color: #4b5563;
-            margin-bottom: .25rem;
-        }
+    .avatar-pill span.circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(135deg,#2563eb,#60a5fa);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 600;
+      font-size: .8rem;
+    }
 
-        h6 {
-            font-size: .85rem;
-            font-weight: 600;
-            color: #111827;
-        }
+    /* CONTENT WRAPPER */
+    .app-content {
+      padding: 1.5rem 1.75rem 2.5rem;
+      min-height: 0;
+    }
 
-        small.text-muted {
-            font-size: .78rem;
-        }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
 
-        /* FORMS */
-        .form-control,
-        .form-select {
-            border-radius: .7rem;
-            border-color: var(--border-subtle);
-            font-size: .85rem;
-            padding: .5rem .75rem;
-            background-color: #f9fafb;
-            transition: border-color .16s ease-out, box-shadow .16s ease-out, background-color .16s ease-out;
-        }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 1px rgba(37,99,235,0.08), 0 0 0 3px rgba(191,219,254,0.7);
-            background-color: #ffffff;
-        }
+    .section-subtitle {
+      font-size: .85rem;
+      color: var(--text-muted);
+    }
 
-        .form-text {
-            font-size: .75rem;
-            color: var(--text-muted);
-        }
+    /* CARDS + UI */
+    .card-surface {
+      border-radius: var(--radius-card);
+      border: 1px solid rgba(148,163,184,0.22);
+      background-color: var(--card-bg);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.2rem;
+      transition: box-shadow .18s ease-out, transform .1s ease-out, border-color .18s ease-out;
+    }
+    .card-surface:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+      border-color: rgba(129,140,248,0.5);
+    }
 
-        /* BUTTONS */
-        .btn {
-            border-radius: var(--radius-pill);
-            font-size: .8rem;
-            font-weight: 500;
-            padding: .46rem .95rem;
-            border-width: 1px;
-            transition: background-color .16s ease-out, color .16s ease-out, box-shadow .16s ease-out, border-color .16s ease-out, transform .08s ease-out;
-        }
+    .card-surface-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-bottom: .65rem;
+    }
+    .card-surface-header h6 {
+      margin: 0;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+    .card-surface-header small {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
 
-        .btn:active {
-            transform: translateY(1px);
-            box-shadow: none !important;
-        }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      border-radius: .9rem;
+      padding: .85rem .95rem;
+      background: #ffffff;
+      border: 1px solid rgba(148,163,184,0.2);
+      box-shadow: 0 10px 30px rgba(148,163,184,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .stat-card-label {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+    .stat-card-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .stat-card-extra {
+      font-size: .75rem;
+      color: #4b5563;
+    }
 
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
-        }
+    /* FORMS */
+    label, .form-label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: .25rem;
+    }
+    .form-control,
+    .form-select {
+      border-radius: .7rem;
+      border-color: var(--border-subtle);
+      font-size: .85rem;
+      padding: .5rem .75rem;
+      background-color: #f9fafb;
+      transition: border-color .16s ease-out, box-shadow .16s ease-out, background-color .16s ease-out;
+    }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.08), 0 0 0 3px rgba(191,219,254,0.7);
+      background-color: #ffffff;
+    }
 
-        .btn-primary:hover {
-            background-color: var(--primary-deep);
-            border-color: var(--primary-deep);
-            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.34);
-        }
+    .btn {
+      border-radius: var(--radius-pill);
+      font-size: .8rem;
+      font-weight: 500;
+      padding: .46rem .95rem;
+      border-width: 1px;
+      transition: background-color .16s ease-out, color .16s ease-out,
+                  box-shadow .16s ease-out, border-color .16s ease-out,
+                  transform .08s ease-out;
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: none !important;
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 8px 18px rgba(37,99,235,0.28);
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-deep);
+      border-color: var(--primary-deep);
+      box-shadow: 0 10px 22px rgba(37,99,235,0.34);
+    }
+    .btn-success {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 8px 18px rgba(34,197,94,0.28);
+    }
+    .btn-outline-primary {
+      border-color: rgba(37,99,235,0.7);
+      color: var(--primary-deep);
+      background-color: #eff6ff;
+    }
 
-        .btn-outline-primary {
-            border-color: rgba(37,99,235,0.7);
-            color: var(--primary-deep);
-            background-color: #eff6ff;
-        }
+    .badge-status,
+    .badge {
+      border-radius: var(--radius-pill);
+      font-size: .7rem;
+    }
+    .badge.bg-danger-subtle { background-color: var(--danger-soft) !important; color: #b91c1c !important; }
+    .badge.bg-success-subtle { background-color: var(--accent-soft) !important; color: #166534 !important; }
+    .badge.bg-warning-subtle { background-color: var(--warning-soft) !important; color: #92400e !important; }
+    .badge.bg-primary-subtle { background-color: var(--primary-soft) !important; color: var(--primary-deep) !important; }
 
-        .btn-outline-primary:hover {
-            background-color: var(--primary-deep);
-            color: #ffffff;
-        }
+    /* TABLES */
+    .table { font-size: .8rem; }
+    .table thead th {
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #6b7280;
+      background-color: #f9fafb;
+    }
+    .queue-row {
+      transition: background .14s ease-out, transform .12s ease-out, box-shadow .12s ease-out;
+    }
+    .queue-row:hover {
+      background: var(--primary-soft) !important;
+      cursor: pointer;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(148,163,184,0.35);
+    }
 
-        .btn-success {
-            background-color: var(--accent);
-            border-color: var(--accent);
-            box-shadow: 0 8px 18px rgba(34,197,94,0.28);
-        }
+    /* API LOG PANEL */
+    #apiResponse {
+      font-family: "JetBrains Mono", Menlo, Consolas, monospace;
+      border-radius: .8rem;
+      background: radial-gradient(circle at top left, rgba(59,130,246,0.28), transparent 65%), #020617;
+      border: 1px solid rgba(30,64,175,0.7);
+      font-size: .78rem;
+      line-height: 1.45;
+      color: #e5e7eb;
+      max-height: 260px;
+      overflow: auto;
+      padding: 1rem 1.1rem;
+      margin: 0;
+    }
 
-        .btn-success:hover {
-            background-color: #15803d;
-            border-color: #15803d;
-            box-shadow: 0 10px 22px rgba(34,197,94,0.35);
-        }
+    /* PAGES */
+    .page-view {
+      display: none;
+    }
+    .page-view.active {
+      display: block;
+    }
 
-        .btn-outline-secondary {
-            border-color: #d1d5db;
-            color: #4b5563;
-            background-color: #f9fafb;
-        }
+    /* RESPONSIVE */
+    @media (max-width: 991.98px) {
+      .app-wrapper {
+        flex-direction: column;
+      }
+      .app-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        padding: .5rem .75rem;
+      }
+      .sidebar-brand {
+        margin-bottom: 0;
+        margin-right: .75rem;
+      }
+      .sidebar-menu-title,
+      .sidebar-footer {
+        display: none;
+      }
+      .sidebar-nav {
+        display: flex;
+        gap: .25rem;
+        overflow-x: auto;
+      }
+      .sidebar-link span.label {
+        display: none;
+      }
+      .sidebar-link {
+        padding: .4rem .6rem;
+      }
+      .app-topbar {
+        padding-inline: 1rem;
+      }
+      .app-content {
+        padding-inline: 1rem;
+      }
+      .stat-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+    }
 
-        .btn-outline-secondary:hover {
-            background-color: #e5e7eb;
-        }
-
-        /* BADGES & STATUS */
-        .badge-status,
-        .badge {
-            border-radius: var(--radius-pill);
-        }
-
-        .badge-status {
-            font-size: .7rem;
-            padding: .26rem .6rem;
-            letter-spacing: .02em;
-        }
-
-        .badge.bg-danger-subtle {
-            background-color: var(--danger-soft) !important;
-            color: #b91c1c !important;
-        }
-
-        .badge.bg-success-subtle,
-        .text-bg-success-subtle {
-            background-color: var(--accent-soft) !important;
-            color: #166534 !important;
-        }
-
-        .badge.bg-warning-subtle {
-            background-color: var(--warning-soft) !important;
-            color: #92400e !important;
-        }
-
-        .badge.bg-primary-subtle {
-            background-color: var(--primary-soft) !important;
-            color: var(--primary-deep) !important;
-        }
-
-        /* API RESPONSE */
-        #apiResponse {
-            font-family: "JetBrains Mono", Menlo, Consolas, monospace;
-            border-radius: .8rem;
-            background: #020617;
-            background: radial-gradient(circle at top left, rgba(59,130,246,0.28), transparent 65%), #020617;
-            border: 1px solid rgba(30,64,175,0.7);
-            font-size: .78rem;
-            line-height: 1.45;
-            color: #e5e7eb;
-            max-height: 260px;
-            overflow: auto;
-            padding: 1rem 1.1rem;
-        }
-
-        #apiResponse::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #apiResponse::-webkit-scrollbar-thumb {
-            background-color: rgba(148,163,184,0.8);
-            border-radius: 999px;
-        }
-
-        /* TABLES */
-        .table {
-            font-size: .8rem;
-        }
-
-        .table thead tr {
-            border-color: rgba(226,232,240,0.9);
-        }
-
-        .table thead th {
-            font-size: .75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: #6b7280;
-            background-color: #f9fafb;
-        }
-
-        .table tbody tr {
-            border-color: rgba(241,245,249,0.9);
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f9fafb;
-        }
-
-        .queue-row {
-            transition: background .14s ease-out, transform .12s ease-out, box-shadow .12s ease-out;
-        }
-
-        .queue-row:hover {
-            background: var(--primary-soft) !important;
-            cursor: pointer;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 16px rgba(148,163,184,0.35);
-        }
-
-        /* RESPONSIVE TWEAKS */
-        @media (max-width: 991.98px) {
-            .page-title {
-                font-size: 1.5rem;
-            }
-            .page-header {
-                padding-block: 1.5rem 1rem;
-            }
-            .card-step .card-body {
-                padding-inline: 1rem;
-            }
-            .app-shell {
-                padding-top: 1.25rem;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .page-header {
-                text-align: left;
-            }
-            .page-subtitle {
-                max-width: 100%;
-            }
-            .app-navbar .text-white-50 {
-                display: none !important;
-            }
-        }
-    </style>
+    @media (max-width: 575.98px) {
+      .stat-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
+  </style>
 </head>
 <body>
 
-<nav class="navbar app-navbar">
-    <div class="container d-flex justify-content-between align-items-center py-2">
-        <a class="navbar-brand" href="#">
-            Antrean Rumah Sakit
+<div class="app-wrapper">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <i class="bx bx-pulse"></i>
+      </div>
+      <div class="sidebar-brand-title">
+        <span>Antrean RS</span>
+        <span>Demo Backend & API</span>
+      </div>
+    </div>
+
+    <div class="sidebar-menu-title">Menu</div>
+    <ul class="sidebar-nav">
+      <li>
+        <a class="sidebar-link active" data-page-target="dashboard">
+          <i class="bx bx-grid-alt"></i>
+          <span class="label">Dashboard</span>
         </a>
-        <div class="d-flex gap-2 align-items-center">
-            <span class="text-white-50 d-none d-md-inline" style="font-size:.8rem; color:#6b7280 !important;">
-                Cek endpoint backend
-            </span>
-            <a href="/docs" class="btn btn-sm btn-outline-light">
-                Dokumentasi Swagger
-            </a>
-        </div>
+      </li>
+      <li>
+        <a class="sidebar-link" data-page-target="admin">
+          <i class="bx bx-shield-quarter"></i>
+          <span class="label">Admin Panel</span>
+        </a>
+      </li>
+      <li>
+        <a class="sidebar-link" data-page-target="patient">
+          <i class="bx bx-user-circle"></i>
+          <span class="label">Pasien</span>
+        </a>
+      </li>
+      <li>
+        <a class="sidebar-link" data-page-target="doctor">
+          <i class="bx bx-stethoscope"></i>
+          <span class="label">Dokter</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div>Backend siap dicek lewat Swagger.</div>
+      <div><strong>/docs</strong> untuk dokumentasi.</div>
     </div>
-</nav>
+  </aside>
 
-<div class="container app-shell">
+  <!-- ===== MAIN AREA ===== -->
+  <main class="app-main">
 
-    <!-- HEADER -->
-    <div class="page-header">
-        <div class="section-label">
-            <span></span>
-            Antrean Rumah Sakit
-        </div>
-        <h1 class="page-title">
-            Antrean Rumah Sakit
-        </h1>
-        <p class="page-subtitle">
-            Simulasikan alur lengkap mulai dari <strong>setup Admin</strong>,
-            <strong>registrasi pasien</strong>, sampai <strong>dokter memanggil & menyelesaikan antrean</strong>.
-            Semua request API dan respons bisa dilihat di panel bawah.
-        </p>
-    </div>
-
-    <!-- ================== SECTION A: SETUP DATA ================== -->
-    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-        <h3 class="mb-0 section-heading">
-            A. Setup Data <span class="text-muted" style="font-weight:400;">(Admin & Pasien)</span>
-        </h3>
-        <span class="badge rounded-pill text-bg-success-subtle text-success px-3 py-2" style="font-size:.75rem;">
-            1. Admin → 2. Klinik → 3. Dokter → 4. Pasien → 5. Antrean
+    <!-- TOPBAR -->
+    <header class="app-topbar">
+      <div class="topbar-title">
+        <span>Dashboard Antrean Rumah Sakit</span>
+        <span id="topbarCurrentPage">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <span class="tag-soft">
+          <i class="bx bx-link-alt me-1"></i> Cek endpoint backend
         </span>
-    </div>
+        <a href="/docs" class="btn btn-sm btn-outline-primary">
+          <i class="bx bx-book-open me-1"></i> Dokumentasi Swagger
+        </a>
+        <div class="avatar-pill">
+          <span class="circle">RS</span>
+          <span>Simulasi Antrean</span>
+        </div>
+      </div>
+    </header>
 
-    <div class="row g-4 mb-4">
-        <!-- ===== Admin & Response ===== -->
-        <div class="col-lg-4">
-            <!-- Admin Auth -->
-            <div class="card card-step mb-4">
-                <div class="card-header">
-                    <span>1. Admin – Register & Login</span>
-                    <small>Role: <span class="badge rounded-pill bg-primary-subtle text-primary">admin</span></small>
-                </div>
-                <div class="card-body">
-                    <form id="admin-register-form" class="mb-3">
-                        <h6 class="mb-2">Register Admin</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="adminRegName"
-                                   placeholder="Nama admin" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="adminRegEmail"
-                                   placeholder="admin@example.com" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="adminRegPassword"
-                                   placeholder="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">No. HP</label>
-                            <input type="text" class="form-control" id="adminRegPhone"
-                                   placeholder="08xxxx" required>
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary w-100 mb-2">
-                            Daftarkan Admin
-                        </button>
-                    </form>
+    <!-- CONTENT -->
+    <div class="app-content">
 
-                    <div class="border-top pt-3 mt-2">
-                        <form id="admin-login-form">
-                            <h6 class="mb-2">Login Admin</h6>
-                            <div class="mb-2">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="adminEmail"
-                                       placeholder="admin@example.com" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Kata Sandi</label>
-                                <input type="password" class="form-control" id="adminPassword"
-                                       placeholder="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                Login Admin
-                            </button>
-                        </form>
-
-                        <div class="mt-3">
-                            <small class="text-muted d-block mb-1">Status Admin:</small>
-                            <span id="adminStatus" class="badge bg-danger-subtle text-danger">
-                                Belum login
-                            </span>
-                        </div>
-                        <div class="mt-2 small text-muted">
-                            Token admin: <span id="adminTokenPreview">-</span>
-                        </div>
-                    </div>
-                </div>
+      <!-- ===== PAGE: DASHBOARD ===== -->
+      <section class="page-view active" id="page-dashboard">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Ringkasan Sistem</div>
+            <div class="section-subtitle">
+              Lihat gambaran singkat alur antrean. Data di bawah hanya contoh visual, bukan report real time.
             </div>
-
-            <!-- Response API -->
-            <div class="card card-step">
-                <div class="card-header">
-                    <span>7. Respons API</span>
-                    <small>Request terakhir</small>
-                </div>
-                <div class="card-body">
-                    <pre id="apiResponse" class="text-light mb-0">
-Belum ada request.
-                    </pre>
-                </div>
-            </div>
+          </div>
         </div>
 
-       <!-- ==================== KLINIK & DOKTER ==================== -->
-<div class="col-lg-6">
+       <div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-card-label">Total Antrean Hari Ini</div>
+    <div class="stat-card-value" id="statTotalQueues">0</div>
+    <div class="stat-card-extra">Pasien terdaftar di semua klinik.</div>
+  </div>
 
-    <!-- ===================== KLINIK ===================== -->
-    <div class="card card-step mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>2. Klinik</span>
-            <button id="btnLoadClinics" class="btn btn-sm btn-outline-primary">Muat Klinik</button>
-        </div>
+  <div class="stat-card">
+    <div class="stat-card-label">Antrean Belum Dipanggil</div>
+    <div class="stat-card-value text-warning" id="statWaiting">0</div>
+    <div class="stat-card-extra">Menunggu status IN_SERVICE.</div>
+  </div>
 
-        <div class="card-body">
-            <form id="clinic-form" class="mb-3">
-                <h6 class="mb-2">Buat Klinik</h6>
+  <div class="stat-card">
+    <div class="stat-card-label">Antrean Selesai</div>
+    <div class="stat-card-value text-success" id="statCompleted">0</div>
+    <div class="stat-card-extra">Sudah dibuatkan record kunjungan.</div>
+  </div>
 
-                <label class="form-label">Nama Klinik</label>
-                <input type="text" class="form-control mb-2" id="clinicName" placeholder="Klinik Umum" required>
-
-                <label class="form-label">Deskripsi</label>
-                <input type="text" class="form-control mb-3" id="clinicDesc" placeholder="Deskripsi singkat">
-
-                <button class="btn btn-success w-100">Simpan Klinik</button>
-            </form>
-
-            <div class="table-responsive">
-                <table class="table table-sm mb-0 align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama Klinik</th>
-                    </tr>
-                    </thead>
-                    <tbody id="clinicTableBody">
-                    <tr>
-                        <td colspan="2" class="text-muted text-center py-3">
-                            Belum ada data. Klik <strong>Muat Klinik</strong>.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <small class="text-muted d-block mt-2">
-                Gunakan <strong>clinic_id</strong> untuk menambahkan dokter.
-            </small>
-        </div>
-    </div>
-
-
-    <!-- ===================== DOKTER ===================== -->
-    <div class="card card-step">
-        <div class="card-header">
-            <span>3. Dokter</span>
-        </div>
-
-        <div class="card-body">
-            <form id="doctor-form">
-                <h6 class="mb-2">Tambah Dokter</h6>
-
-                <!-- Dropdown Klinik -->
-                <label class="form-label">Klinik</label>
-                <select class="form-control mb-3" id="docClinicSelect">
-                    <option value="">-- pilih klinik --</option>
-                </select>
-
-                <label class="form-label">Nama Dokter</label>
-                <input type="text" class="form-control mb-2" id="docName" placeholder="Dr. Andi" required>
-
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control mb-2" id="docEmail" placeholder="dokter@example.com" required>
-
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control mb-2" id="docPassword" placeholder="Password" required>
-
-                <label class="form-label">No. HP</label>
-                <input type="text" class="form-control mb-3" id="docPhone" placeholder="08xxxx" required>
-
-                <label class="form-label">Spesialisasi</label>
-                <input type="text" class="form-control mb-3" id="docSpec" placeholder="Umum / Anak / lainnya" required>
-
-                <button class="btn btn-warning w-100">Simpan Dokter</button>
-            </form>
-
-            <div class="table-responsive mt-3">
-                <table class="table table-sm mb-0 align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Dokter</th>
-                        <th>Klinik</th>
-                    </tr>
-                    </thead>
-                    <tbody id="doctorTableBody">
-                    <tr>
-                        <td colspan="3" class="text-muted text-center py-3">
-                            Belum ada data dokter.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-            <!-- Daftar Antrean Pasien -->
-            <div class="card card-step">
-                <div class="card-header">
-                    <span>5. Pasien – Daftar Antrean</span>
-                    <small>Butuh login pasien</small>
-                </div>
-                <div class="card-body">
-                    <form id="queue-register-form" class="mb-3">
-                        <div class="mb-2">
-                            <label class="form-label">clinic_id</label>
-                            <input type="text" class="form-control" id="queueClinicId"
-                                   placeholder="clinic-001" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">doctor_id</label>
-                            <input type="text" class="form-control" id="queueDoctorId"
-                                   placeholder="doctor-001" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">
-                            Daftar Antrean (POST /api/queues/register)
-                        </button>
-                    </form>
-
-                    <small class="text-muted">
-                        Simpan <strong>queue.id</strong> dari respons untuk dipakai
-                        dokter di bagian B.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-     <!-- Complete & Call Queue -->
-        <div class="col-lg-8">
-            <div class="card card-step mb-4">
-                <div class="card-header">
-                    <span>7. Selesaikan Antrean (Panggil + Complete)</span>
-                    <span class="badge rounded-pill text-bg-success-subtle text-success">
-                        Data ala Kaggle
-                    </span>
-                </div>
-                <div class="card-body">
-                    <form id="complete-queue-form" class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Queue ID</label>
-                            <input type="text" class="form-control" id="queueId"
-                                   placeholder="klik antrean di tabel atau isi manual" required>
-                            <div class="form-text">
-                                Dipilih dari tabel antrean di bawah atau dari respons pasien.
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Keluhan / Alasan Kunjungan</label>
-                            <input type="text" class="form-control" id="reason"
-                                   value="Demam dan batuk" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Jumlah Pembayaran</label>
-                            <input type="number" class="form-control" id="paymentAmount"
-                                   value="200000" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Metode Pembayaran</label>
-                            <select class="form-control" id="modeOfPayment" required>
-                                <option value="Transfer">Transfer</option>
-                                <option value="Cash" selected>Cash</option>
-                                <option value="Qris">QRIS</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Jenis Kunjungan</label>
-                            <select class="form-control" id="modeOfAppointment" required>
-                                <option value="In Person" selected>Tatap Muka (In Person)</option>
-                                <option value="Telepon">Telepon</option>
-                                <option value="Online">Online / Video Call</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 d-flex flex-wrap gap-2 mt-1">
-                            <button type="button" id="btnCallQueue" class="btn btn-outline-primary">
-                                Panggil Antrean (ubah ke IN_SERVICE)
-                            </button>
-
-                            <button type="submit" class="btn btn-success">
-                                Selesaikan Antrean dengan Data Kaggle
-                            </button>
-
-                            <button type="button" id="btnResetForm" class="btn btn-outline-secondary">
-                                Reset Formulir
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-    
-
-<!-- ================== SECTION B: PASIEN ( REGISTER + DAFTAR ) ================== -->
-
- <hr class="my-4">
-<div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-    <h3 class="mb-0 section-heading">
-        B. Pasien – Registrasi & Pengelolaan Antrean
-    </h3>
-    <span class="badge rounded-pill text-bg-primary-subtle text-primary px-3 py-2" style="font-size:.75rem;">
-        Login → Pilih Klinik → Daftar Antrean → Cek Status
-    </span>
+  <div class="stat-card">
+    <div class="stat-card-label">Dokter Aktif</div>
+    <div class="stat-card-value" id="statActiveDoctors">0</div>
+    <div class="stat-card-extra">Tersebar di beberapa klinik.</div>
+  </div>
 </div>
 
 
- <!-- ===== Pasien & Antrean ===== -->
-        <div class="col-lg-4">
-            <!-- Pasien -->
-            <div class="card card-step mb-4">
-                <div class="card-header">
-                    <span>4. Pasien – Register & Login</span>
-                    <small>Role: <span class="badge rounded-pill bg-primary-subtle text-primary">patient</span></small>
-                </div>
-                <div class="card-body">
-                    <form id="patient-register-form" class="mb-3">
-                        <h6 class="mb-2">Register Pasien</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="patName"
-                                   placeholder="Nama pasien" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="patEmail"
-                                   placeholder="patient@example.com" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="patPassword"
-                                   placeholder="Password pasien" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">No. HP</label>
-                            <input type="text" class="form-control" id="patPhone"
-                                   placeholder="No. HP pasien" required>
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary w-100">
-                            Daftarkan Pasien
-                        </button>
-                    </form>
-
-                    <div class="border-top pt-3 mt-2">
-                        <form id="patient-login-form">
-                            <h6 class="mb-2">Login Pasien</h6>
-                            <div class="mb-2">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="patLoginEmail"
-                                       placeholder="patient@example.com" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Kata Sandi</label>
-                                <input type="password" class="form-control" id="patLoginPassword"
-                                       placeholder="Password pasien" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                Login Pasien
-                            </button>
-                        </form>
-
-                        <div class="mt-3">
-                            <small class="text-muted d-block mb-1">Status Pasien:</small>
-                            <span id="patientStatus" class="badge bg-danger-subtle text-danger">
-                                Belum login
-                            </span>
-                        </div>
-                        <div class="mt-2 small text-muted">
-                            Token pasien: <span id="patientTokenPreview">-</span>
-                        </div>
-                    </div>
-                </div>
+        <div class="row g-3">
+          <div class="col-xl-8">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>Alur Cepat Uji Coba API</h6>
+                <small>Ikuti langkah ini untuk melihat flow lengkap.</small>
+              </div>
+              <ol class="small mb-2">
+                <li>Register & login <strong>Admin</strong>.</li>
+                <li>Buat beberapa <strong>Klinik</strong> & <strong>Dokter</strong>.</li>
+                <li>Register & login <strong>Pasien</strong>, lalu daftar antrean.</li>
+                <li>Login sebagai <strong>Dokter</strong>, muat antrean, panggil, lalu selesaikan.</li>
+              </ol>
+              <div class="alert alert-primary mb-0 small">
+                Semua request & respons API bisa kamu pantau di panel <strong>Log Respons API</strong> di bawah.
+              </div>
             </div>
+          </div>
 
-            <!-- Daftar Antrean Pasien -->
-            <div class="card card-step">
-                <div class="card-header">
-                    <span>5. Pasien – Daftar Antrean</span>
-                    <small>Butuh login pasien</small>
+          <div class="col-xl-4">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>Status Session</h6>
+                <small>Token tersimpan di memori halaman.</small>
+              </div>
+              <div class="small mb-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span>Admin</span>
+                  <span id="adminStatus" class="badge bg-danger-subtle text-danger">Belum login</span>
                 </div>
-                <div class="card-body">
-                    <form id="queue-register-form" class="mb-3">
-                        <div class="mb-2">
-                            <label class="form-label">clinic_id</label>
-                            <input type="text" class="form-control" id="queueClinicId"
-                                   placeholder="clinic-001" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">doctor_id</label>
-                            <input type="text" class="form-control" id="queueDoctorId"
-                                   placeholder="doctor-001" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">
-                            Daftar Antrean (POST /api/queues/register)
-                        </button>
-                    </form>
+                <div class="text-muted mb-2">
+                  Token admin: <span id="adminTokenPreview">-</span>
+                </div>
 
-                    <small class="text-muted">
-                        Simpan <strong>queue.id</strong> dari respons untuk dipakai
-                        dokter di bagian B.
-                    </small>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span>Pasien</span>
+                  <span id="patientStatus" class="badge bg-danger-subtle text-danger">Belum login</span>
                 </div>
+                <div class="text-muted mb-2">
+                  Token pasien: <span id="patientTokenPreview">-</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span>Dokter</span>
+                  <span id="loginStatus" class="badge bg-danger-subtle text-danger">Belum login</span>
+                </div>
+                <div class="text-muted">
+                  Token dokter: <span id="doctorTokenPreview">-</span>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
-<!-- Pasien – Cek Status Antrean -->
-<div class="card card-step mt-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>6. Pasien – Cek Status Antrean</span>
-        <button id="btnCheckQueue" class="btn btn-sm btn-outline-secondary">
-            Cek Antrean
-        </button>
-    </div>
-
-    <div class="card-body">
-        <div class="mb-3">
-            <label class="form-label">Masukkan Queue ID</label>
-            <input type="text" class="form-control" id="queueCheckInput"
-                   placeholder="queue-001">
+          </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead class="table-light">
-                <tr>
+        <!-- LOG RESPON API (GLOBAL) -->
+        <div class="card-surface">
+          <div class="card-surface-header">
+            <h6>Log Respons API</h6>
+            <small>Request terakhir</small>
+          </div>
+          <pre id="apiResponse">Belum ada request.</pre>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: ADMIN ===== -->
+      <section class="page-view" id="page-admin">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Panel Admin</div>
+            <div class="section-subtitle">
+              Kelola akun admin, data klinik, dan registrasi dokter. Semua endpoint tetap sama dengan versi sebelumnya.
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Admin Auth -->
+          <div class="col-lg-4">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>1. Admin – Register</h6>
+                <small>Role: admin</small>
+              </div>
+              <form id="admin-register-form">
+                <div class="mb-2">
+                  <label class="form-label">Nama</label>
+                  <input type="text" class="form-control" id="adminRegName" placeholder="Nama admin" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="adminRegEmail" placeholder="admin@example.com" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Kata Sandi</label>
+                  <input type="password" class="form-control" id="adminRegPassword" placeholder="password" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">No. HP</label>
+                  <input type="text" class="form-control" id="adminRegPhone" placeholder="08xxxx" required>
+                </div>
+                <button type="submit" class="btn btn-outline-primary w-100">
+                  Daftarkan Admin
+                </button>
+              </form>
+            </div>
+
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>2. Admin – Login</h6>
+                <small>Token dipakai untuk endpoint admin.</small>
+              </div>
+              <form id="admin-login-form">
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="adminEmail" placeholder="admin@example.com" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Kata Sandi</label>
+                  <input type="password" class="form-control" id="adminPassword" placeholder="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Login Admin
+                </button>
+              </form>
+              <div class="small text-muted mt-2">
+                Status & token juga terlihat di halaman Dashboard.
+              </div>
+            </div>
+          </div>
+
+          <!-- Klinik -->
+          <div class="col-lg-4">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>3. Klinik</h6>
+                <button id="btnLoadClinics" class="btn btn-sm btn-outline-primary">
+                  Muat Klinik
+                </button>
+              </div>
+
+              <form id="clinic-form" class="mb-3">
+                <div class="mb-2">
+                  <label class="form-label">Nama Klinik</label>
+                  <input type="text" class="form-control" id="clinicName" placeholder="Klinik Umum" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Deskripsi</label>
+                  <input type="text" class="form-control" id="clinicDesc" placeholder="Deskripsi singkat">
+                </div>
+                <button type="submit" class="btn btn-success w-100">
+                  Simpan Klinik
+                </button>
+              </form>
+
+              <div class="table-responsive mb-2">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nama Klinik</th>
+                  </tr>
+                  </thead>
+                  <tbody id="clinicTableBody">
+                  <tr>
+                    <td colspan="2" class="text-muted text-center py-3">Belum ada data.</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <small class="text-muted">
+                Klinik aktif juga muncul di dropdown pasien & dokter.
+              </small>
+            </div>
+          </div>
+
+          <!-- Dokter -->
+          <div class="col-lg-4">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>4. Registrasi Dokter</h6>
+                <small>Register user + profil dokter</small>
+              </div>
+              <form id="doctor-register-form">
+                <div class="mb-2">
+                  <label class="form-label">Nama</label>
+                  <input type="text" class="form-control" id="docName" placeholder="Dr. Andi" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="docEmail" placeholder="dokter@example.com" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Kata Sandi</label>
+                  <input type="password" class="form-control" id="docPassword" placeholder="Password dokter" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">No. HP</label>
+                  <input type="text" class="form-control" id="docPhone" placeholder="No. HP dokter" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Spesialisasi</label>
+                  <input type="text" class="form-control" id="docSpec" placeholder="Umum / Anak / dll" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Klinik</label>
+                  <select class="form-select" id="docClinicId" required>
+                    <option value="">Pilih klinik...</option>
+                  </select>
+                  <div class="form-text">
+                    Diambil dari daftar klinik yang sudah dibuat admin.
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-warning w-100">
+                  Register Dokter + Simpan Profil
+                </button>
+              </form>
+              <div class="small text-muted mt-2">
+                Setelah berhasil, <strong>doctor_id</strong> otomatis diisi di form antrean pasien.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log API tetap 1 tempat di dashboard, jadi di sini tidak diulang -->
+      </section>
+
+      <!-- ===== PAGE: PATIENT ===== -->
+      <section class="page-view" id="page-patient">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Pasien</div>
+            <div class="section-subtitle">
+              Gunakan bagian ini untuk mendaftarkan akun pasien, login, dan mendaftarkan antrean.
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Register & Login -->
+          <div class="col-lg-5">
+            <div class="card-surface mb-3">
+              <div class="card-surface-header">
+                <h6>1. Register Pasien</h6>
+                <small>Role: patient</small>
+              </div>
+              <form id="patient-register-form">
+                <div class="mb-2">
+                  <label class="form-label">Nama</label>
+                  <input type="text" class="form-control" id="patName" placeholder="Nama pasien" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="patEmail" placeholder="patient@example.com" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Kata Sandi</label>
+                  <input type="password" class="form-control" id="patPassword" placeholder="Password pasien" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">No. HP</label>
+                  <input type="text" class="form-control" id="patPhone" placeholder="No. HP pasien" required>
+                </div>
+                <button type="submit" class="btn btn-outline-primary w-100">
+                  Daftarkan Pasien
+                </button>
+              </form>
+            </div>
+
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>2. Login Pasien</h6>
+                <small>Token dipakai untuk daftar antrean.</small>
+              </div>
+              <form id="patient-login-form">
+                <div class="mb-2">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="patLoginEmail" placeholder="patient@example.com" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Kata Sandi</label>
+                  <input type="password" class="form-control" id="patLoginPassword" placeholder="Password pasien" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Login Pasien
+                </button>
+              </form>
+              <div class="small text-muted mt-2">
+                Status login & token bisa dilihat juga di halaman Dashboard.
+              </div>
+            </div>
+          </div>
+
+          <!-- Daftar Antrean -->
+          <div class="col-lg-7">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>3. Pasien – Daftar Antrean</h6>
+                <small>Butuh login pasien</small>
+              </div>
+              <form id="queue-register-form" class="mb-3">
+                <div class="mb-2">
+                  <label class="form-label">Klinik</label>
+                  <select class="form-select" id="queueClinicId" required onchange="loadDoctorsByClinic(this.value)">
+                    <option value="">Pilih klinik...</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Dokter</label>
+                    <select class="form-select" id="queueDoctorId" required>
+                  <option value="">Pilih dokter...</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">
+                  Daftar Antrean
+                </button>
+              </form>
+              <small class="text-muted">
+                Simpan <strong>queue.id</strong> dari respons untuk dipakai dokter pada langkah berikutnya.
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAGE: DOCTOR ===== -->
+      <section class="page-view" id="page-doctor">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Dokter – Kunjungan & Antrean</div>
+            <div class="section-subtitle">
+              Login sebagai dokter, lihat daftar antrean aktif, panggil, lalu selesaikan dengan detail kunjungan.
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Login Dokter -->
+          <div class="col-lg-4">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>1. Login Dokter</h6>
+                <small>Role: doctor</small>
+              </div>
+              <form id="doctor-login-form">
+                <div class="mb-3">
+                  <label class="form-label">Email Dokter</label>
+                  <input type="email" class="form-control" id="doctorEmail" placeholder="dokter@example.com" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Kata Sandi Dokter</label>
+                  <input type="password" class="form-control" id="doctorPassword" placeholder="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Login Dokter
+                </button>
+              </form>
+              <div class="small text-muted mt-2">
+                Setelah login, klik <strong>Muat Antrean</strong> untuk melihat daftar antrean aktif.
+              </div>
+            </div>
+
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>Ringkasan Kunjungan</h6>
+                <small>Isi setelah pilih Queue ID</small>
+              </div>
+              <form id="complete-queue-form" class="row g-2">
+                <div class="col-12">
+                  <label class="form-label">Queue ID</label>
+                  <input type="text" class="form-control" id="queueId" placeholder="klik antrean di tabel atau isi manual" required>
+                  <div class="form-text">
+                    Klik baris antrean di tabel untuk mengisi otomatis.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Keluhan / Alasan Kunjungan</label>
+                  <input type="text" class="form-control" id="reason" value="Demam dan batuk" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Jumlah Pembayaran</label>
+                  <input type="number" class="form-control" id="paymentAmount" value="200000" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Metode Pembayaran</label>
+                  <select class="form-select" id="modeOfPayment" required>
+                    <option value="Cash" selected>Cash</option>
+                    <option value="Qris">QRIS</option>
+                    <option value="Transfer">Transfer</option>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Jenis Kunjungan</label>
+                  <select class="form-select" id="modeOfAppointment" required>
+                    <option value="In Person" selected>Tatap Muka (In Person)</option>
+                    <option value="Telepon">Telepon</option>
+                    <option value="Online">Online / Video Call</option>
+                  </select>
+                </div>
+
+                <div class="col-12 d-flex flex-wrap gap-2 mt-1">
+                  <button type="button" id="btnCallQueue" class="btn btn-outline-primary">
+                    Panggil Antrean (IN_SERVICE)
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    Selesaikan Antrean
+                  </button>
+                  <button type="button" id="btnResetForm" class="btn btn-outline-secondary">
+                    Reset Formulir
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Daftar Antrean -->
+          <div class="col-lg-8">
+            <div class="card-surface">
+              <div class="card-surface-header">
+                <h6>2. Daftar Antrean Aktif</h6>
+                <button id="btnLoadQueues" class="btn btn-sm btn-outline-primary">
+                  Muat Antrean
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                  <tr>
                     <th>Queue ID</th>
                     <th>No. Antrean</th>
-                    <th>Status</th>
-                    <th>Dokter</th>
+                    <th>Pasien</th>
                     <th>Klinik</th>
-                </tr>
-                </thead>
-                <tbody id="queueCheckTableBody">
-                <tr>
+                    <th>Status</th>
+                  </tr>
+                  </thead>
+                  <tbody id="queueTableBody">
+                  <tr>
                     <td colspan="5" class="text-muted text-center py-3">
-                        Masukkan Queue ID lalu klik <strong>Cek Antrean</strong>.
+                      Belum ada data. Login dokter lalu klik <strong>Muat Antrean</strong>.
                     </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-
-
-
-    <!-- ================== SECTION C: DOKTER (CALL + COMPLETE) ================== -->
-    <hr class="my-4">
-    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-        <h3 class="mb-0 section-heading">
-            B. Dokter – Kunjungan & Selesaikan Antrean
-        </h3>
-        <span class="badge rounded-pill text-bg-success-subtle text-success px-3 py-2" style="font-size:.75rem;">
-            Login Dokter → Muat Antrean → Panggil → Selesaikan
-        </span>
-    </div>
-
-      <!-- Dokter -->
-            <div class="card card-step">
-                <div class="card-header">
-                    <span>3. Dokter (Register User + Profil)</span>
-                    <small>Hanya Admin</small>
-                </div>
-                <div class="card-body">
-                    <form id="doctor-register-form" class="mb-1">
-                        <h6 class="mb-2">Register Akun Dokter</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Nama</label>
-                            <input type="text" class="form-control" id="docName"
-                                   placeholder="Dr. Andi" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="docEmail"
-                                   placeholder="dokter@example.com" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="docPassword"
-                                   placeholder="Password dokter" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">No. HP</label>
-                            <input type="text" class="form-control" id="docPhone"
-                                   placeholder="No. HP dokter" required>
-                        </div>
-
-                        <h6 class="mt-1 mb-2">Data Dokter (Profil)</h6>
-                        <div class="mb-2">
-                            <label class="form-label">Spesialisasi</label>
-                            <input type="text" class="form-control" id="docSpec"
-                                   placeholder="Umum / Anak / dll" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">clinic_id</label>
-                            <input type="text" class="form-control" id="docClinicId"
-                                   placeholder="clinic-001" required>
-                            <div class="form-text">
-                                Ambil dari tabel klinik di atas.
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-warning w-100">
-                            Register Dokter + Simpan Profil
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <!-- Login Dokter -->
-            <div class="card card-step mb-4">
-                <div class="card-header">
-                    <span>6. Login sebagai Dokter</span>
-                    <small>JWT Access Token</small>
-                </div>
-                <div class="card-body">
-                    <form id="doctor-login-form" class="mb-2">
-                        <div class="mb-3">
-                            <label class="form-label">Email Dokter</label>
-                            <input type="email" class="form-control" id="doctorEmail"
-                                   placeholder="dokter@example.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kata Sandi Dokter</label>
-                            <input type="password" class="form-control" id="doctorPassword"
-                                   placeholder="password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            Login Dokter
-                        </button>
-                    </form>
-
-                    <div class="mt-2">
-                        <small class="text-muted d-block mb-1">Status login dokter:</small>
-                        <span id="loginStatus" class="badge bg-danger-subtle text-danger">
-                            Belum login
-                        </span>
-                    </div>
-
-                    <div class="mt-3 small text-muted">
-                        Token dokter (JWT): <span id="doctorTokenPreview">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Complete & Call Queue -->
-        <div class="col-lg-8">
-            <div class="card card-step mb-4">
-                <div class="card-header">
-                    <span>7. Selesaikan Antrean (Panggil + Complete)</span>
-                    <span class="badge rounded-pill text-bg-success-subtle text-success">
-                        Data ala Kaggle
-                    </span>
-                </div>
-                <div class="card-body">
-                    <form id="complete-queue-form" class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Queue ID</label>
-                            <input type="text" class="form-control" id="queueId"
-                                   placeholder="klik antrean di tabel atau isi manual" required>
-                            <div class="form-text">
-                                Dipilih dari tabel antrean di bawah atau dari respons pasien.
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Keluhan / Alasan Kunjungan</label>
-                            <input type="text" class="form-control" id="reason"
-                                   value="Demam dan batuk" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Jumlah Pembayaran</label>
-                            <input type="number" class="form-control" id="paymentAmount"
-                                   value="200000" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Metode Pembayaran</label>
-                            <select class="form-control" id="modeOfPayment" required>
-                                <option value="Transfer">Transfer</option>
-                                <option value="Cash" selected>Cash</option>
-                                <option value="Qris">QRIS</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Jenis Kunjungan</label>
-                            <select class="form-control" id="modeOfAppointment" required>
-                                <option value="In Person" selected>Tatap Muka (In Person)</option>
-                                <option value="Telepon">Telepon</option>
-                                <option value="Online">Online / Video Call</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 d-flex flex-wrap gap-2 mt-1">
-                            <button type="button" id="btnCallQueue" class="btn btn-outline-primary">
-                                Panggil Antrean (ubah ke IN_SERVICE)
-                            </button>
-
-                            <button type="submit" class="btn btn-success">
-                                Selesaikan Antrean dengan Data Kaggle
-                            </button>
-
-                            <button type="button" id="btnResetForm" class="btn btn-outline-secondary">
-                                Reset Formulir
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <small class="text-muted d-block mt-2">
+                Klik baris antrean untuk mengisi <strong>Queue ID</strong> secara otomatis.
+              </small>
             </div>
 
-            <!-- Daftar Antrean -->
-            <div class="card card-step">
-                <div class="card-header">
-                    <span>8. Daftar Antrean Aktif</span>
-                    <button id="btnLoadQueues" class="btn btn-sm btn-outline-primary">
-                        Muat Antrean
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Queue ID</th>
-                                <th>No. Antrean</th>
-                                <th>Pasien</th>
-                                <th>Klinik</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody id="queueTableBody">
-                            <tr>
-                                <td colspan="5" class="text-muted text-center py-3">
-                                    Belum ada data. Login dokter lalu klik <strong>Muat Antrean</strong>.
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <small class="text-muted d-block mt-2">
-                        Klik baris antrean untuk mengisi <strong>Queue ID</strong> secara otomatis.
-                    </small>
-                </div>
-            </div>
+            <!-- API log sudah di dashboard supaya tidak dobel -->
+          </div>
         </div>
-    </div>
+      </section>
+
+    </div><!-- /app-content -->
+  </main>
 </div>
 
 <script>
-    // kosong = pakai origin yang sama, jadi http://127.0.0.1:8000
-    const BASE_URL = "";
+  // =================== CONFIG ===================
+  const BASE_URL = ""; // ganti kalau backend beda origin
 
-    let adminToken = null;   // session_token admin
-    let patientToken = null; // session_token patient
-    let doctorToken = null;  // session_token doctor
+  let adminToken = null;
+  let patientToken = null;
+  let doctorToken = null;
+  let cachedClinics = [];
 
-    function setApiResponse(data) {
-        const el = document.getElementById("apiResponse");
-        el.textContent = typeof data === "string"
-            ? data
-            : JSON.stringify(data, null, 2);
+  function setApiResponse(data) {
+    const el = document.getElementById("apiResponse");
+    if (!el) return;
+    el.textContent = typeof data === "string"
+        ? data
+        : JSON.stringify(data, null, 2);
+  }
+
+  // =================== PAGE SWITCHER ===================
+  function switchPage(pageName) {
+    document.querySelectorAll(".page-view").forEach(p => {
+      p.classList.toggle("active", p.id === "page-" + pageName);
+    });
+    document.querySelectorAll(".sidebar-link").forEach(link => {
+      link.classList.toggle("active", link.getAttribute("data-page-target") === pageName);
+    });
+    const label = {
+      dashboard: "Dashboard",
+      admin: "Panel Admin",
+      patient: "Pasien",
+      doctor: "Dokter & Antrean"
+    }[pageName] || "Dashboard";
+    document.getElementById("topbarCurrentPage").textContent = label;
+  }
+
+  document.querySelectorAll(".sidebar-link").forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = link.getAttribute("data-page-target");
+      if (target) switchPage(target);
+    });
+  });
+
+  // =================== CLINIC DROPDOWNS ===================
+  function populateClinicDropdowns() {
+    const options = cachedClinics.filter(c => c.is_active !== false);
+    const docSelect = document.getElementById("docClinicId");
+    const queueSelect = document.getElementById("queueClinicId");
+
+    [docSelect, queueSelect].forEach(sel => {
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Pilih klinik...</option>';
+      options.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = `${c.name} (${c.id})`;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  async function loadPublicClinicsForDropdowns() {
+    try {
+      const res = await fetch(`${BASE_URL}/api/clinics`);
+      const data = await res.json();
+      if (res.ok) {
+        cachedClinics = data.clinics || [];
+        populateClinicDropdowns();
+      }
+    } catch (err) {
+      console.error("Gagal load klinik publik:", err);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadPublicClinicsForDropdowns);
+
+  // =================== LOAD DOCTORS BY CLINIC ===================
+
+async function loadDoctorsByClinic(clinicId) {
+  console.log("KLINIK DIPILIH:", clinicId);
+  const select = document.getElementById("queueDoctorId");
+  select.innerHTML = `<option value="">Loading dokter...</option>`;
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/doctors?clinic_id=${clinicId}`);
+    const data = await res.json();
+    console.log("API RESPONSE:", data);
+
+
+    const doctors = data.doctors;
+
+    if (!Array.isArray(doctors) || doctors.length === 0) {
+      select.innerHTML = `<option value="">Dokter tidak tersedia</option>`;
+      return;
     }
 
-
-
-
-
-
-
-
-
-
-
-    // ======================= ADMIN =======================
-
-    document.getElementById("admin-register-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const body = {
-                name: document.getElementById("adminRegName").value,
-                email: document.getElementById("adminRegEmail").value,
-                password: document.getElementById("adminRegPassword").value,
-                phone: document.getElementById("adminRegPhone").value,
-                role: "admin"
-            };
-            try {
-                const res = await fetch(`${BASE_URL}/api/auth/register`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                setApiResponse(data);
-                alert(res.ok ? "Register admin berhasil" : "Register admin gagal");
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (register admin)");
-            }
-        });
-
-    document.getElementById("admin-login-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("adminEmail").value;
-            const password = document.getElementById("adminPassword").value;
-            const status = document.getElementById("adminStatus");
-            const tokenPrev = document.getElementById("adminTokenPreview");
-
-            status.textContent = "Proses login...";
-            status.className = "badge bg-warning-subtle text-warning";
-
-            try {
-                const res = await fetch(`${BASE_URL}/api/auth/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                setApiResponse(data);
-
-                if (!res.ok) {
-                    status.textContent = "Gagal login: " + (data.detail || res.status);
-                    status.className = "badge bg-danger-subtle text-danger";
-                    adminToken = null;
-                    tokenPrev.textContent = "-";
-                    return;
-                }
-
-                adminToken = data.session_token;
-                status.textContent = "Login admin OK";
-                status.className = "badge bg-success-subtle text-success";
-                tokenPrev.textContent = adminToken.substring(0, 25) + "...";
-
-                await loadClinics();
-            } catch (err) {
-                console.error(err);
-                status.textContent = "Error koneksi";
-                status.className = "badge bg-danger-subtle text-danger";
-            }
-        });
-
-    // ======================= KLINIK =======================
-
-    document.getElementById("clinic-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (!adminToken) {
-                alert("Harus login admin dulu.");
-                return;
-            }
-            const body = {
-                name: document.getElementById("clinicName").value,
-                description: document.getElementById("clinicDesc").value || null
-            };
-            try {
-                const res = await fetch(`${BASE_URL}/api/clinics`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Session-Token": adminToken
-                    },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                setApiResponse(data);
-                alert(res.ok ? "Klinik tersimpan" : "Gagal menyimpan klinik");
-                if (res.ok) await loadClinics();
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (buat klinik)");
-            }
-        });
-
-async function loadClinics() {
-    const res = await fetch(`${BASE_URL}/api/clinics/all`);
-    const data = await res.json();
-
-    const clinicTable = document.getElementById("clinicTableBody");
-    const selectClinic = document.getElementById("docClinicSelect");
-
-    clinicTable.innerHTML = "";
-    selectClinic.innerHTML = `<option value="">-- pilih klinik --</option>`;
-
-    data.forEach(c => {
-        clinicTable.innerHTML += `
-            <tr>
-                <td>${c.id}</td>
-                <td>${c.name}</td>
-            </tr>
-        `;
-
-        selectClinic.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-    });
-}
-
-document.getElementById("clinic-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const body = {
-        name: document.getElementById("clinicName").value,
-        description: document.getElementById("clinicDesc").value
-    };
-
-    const res = await fetch(`${BASE_URL}/api/clinics/create`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${adminToken}`
-        },
-        body: JSON.stringify(body)
+    select.innerHTML = `<option value="">Pilih dokter...</option>`;
+    doctors.forEach(doc => {
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.textContent = `${doc.name} (${doc.specialization || "Dokter"})`;
+      select.appendChild(opt);
     });
 
-    await res.json();
-    loadClinics();
-});
-
-document.getElementById("doctor-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const body = {
-        name: document.getElementById("docName").value,
-        email: document.getElementById("docEmail").value,
-        password: document.getElementById("docPassword").value,
-        phone: document.getElementById("docPhone").value,
-        specialization: document.getElementById("docSpec").value,
-        clinic_id: document.getElementById("docClinicSelect").value
-    };
-
-    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${adminToken}`
-        },
-        body: JSON.stringify(body)
-    });
-
-    await res.json();
-    loadDoctors();
-});
-
-async function loadDoctors() {
-    const res = await fetch(`${BASE_URL}/api/doctors/all`);
-    const data = await res.json();
-
-    const tbody = document.getElementById("doctorTableBody");
-    tbody.innerHTML = "";
-
-    data.forEach(d => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${d.id}</td>
-                <td>${d.name}</td>
-                <td>${d.clinic_name}</td>
-            </tr>
-        `;
-    });
-}
-
-// ===================== LOAD KLINIK =====================
-document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
-
-async function loadClinics() {
-    const res = await fetch(`${BASE_URL}/api/clinics/all`);
-    const clinics = await res.json();
-
-    const tableBody = document.getElementById("clinicTableBody");
-    const clinicSelect = document.getElementById("docClinicSelect");
-
-    tableBody.innerHTML = "";
-    clinicSelect.innerHTML = `<option value="">-- pilih klinik --</option>`;
-
-    clinics.forEach(c => {
-        // Tabel Klinik
-        tableBody.innerHTML += `
-            <tr>
-                <td>${c.id}</td>
-                <td>${c.name}</td>
-            </tr>
-        `;
-
-        // Dropdown Dokter
-        clinicSelect.innerHTML += `
-            <option value="${c.id}">${c.name}</option>
-        `;
-    });
+  } catch (err) {
+    console.error(err);
+    select.innerHTML = `<option value="">Gagal load dokter</option>`;
+  }
 }
 
 
 
-// ===================== SIMPAN DOKTER =====================
-document.getElementById("doctor-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
 
-    const clinic_id = document.getElementById("docClinicSelect").value;
-
-    const body = {
-        name: document.getElementById("docName").value,
-        email: document.getElementById("docEmail").value,
-        password: document.getElementById("docPassword").value,
-        phone: document.getElementById("docPhone").value,
-        specialization: document.getElementById("docSpec").value,
-        clinic_id: clinic_id
-    };
-
-    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + adminToken
-        },
-        body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-    setApiResponse(data);
-
-    // Refresh tabel dokter
-    loadDoctors();
-});
-
-
-document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
-
-
-    async function loadClinics() {
-        const tbody = document.getElementById("clinicTableBody");
-        if (!adminToken) {
-            tbody.innerHTML =
-                `<tr><td colspan="2" class="text-muted text-center">Harus login admin dulu.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML =
-            `<tr><td colspan="2" class="text-muted text-center">Memuat klinik...</td></tr>`;
+  // =================== ADMIN ===================
+  document.getElementById("admin-register-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const body = {
+          name: document.getElementById("adminRegName").value,
+          email: document.getElementById("adminRegEmail").value,
+          password: document.getElementById("adminRegPassword").value,
+          phone: document.getElementById("adminRegPhone").value,
+          role: "admin"
+        };
         try {
-            const res = await fetch(`${BASE_URL}/api/clinics`, {
-                headers: { "X-Session-Token": adminToken }
-            });
-            const data = await res.json();
-            setApiResponse(data);
-
-            if (!res.ok) {
-                tbody.innerHTML =
-                    `<tr><td colspan="2" class="text-danger text-center">Gagal memuat klinik: ${data.detail || res.status}</td></tr>`;
-                return;
-            }
-
-            const clinics = data.clinics || [];
-            if (!clinics.length) {
-                tbody.innerHTML =
-                    `<tr><td colspan="2" class="text-muted text-center">Belum ada klinik.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = "";
-            clinics.forEach(c => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${c.id}</td><td>${c.name}</td>`;
-                tbody.appendChild(tr);
-            });
+          const res = await fetch(`${BASE_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+          setApiResponse(data);
+          alert(res.ok ? "Register admin berhasil" : "Register admin gagal");
         } catch (err) {
-            console.error(err);
-            tbody.innerHTML =
-                `<tr><td colspan="2" class="text-danger text-center">Error koneksi.</td></tr>`;
+          console.error(err);
+          setApiResponse("Error koneksi (register admin)");
         }
-    }
+      });
 
-    document.getElementById("btnLoadClinics")
-        .addEventListener("click", loadClinics);
+  document.getElementById("admin-login-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("adminEmail").value;
+        const password = document.getElementById("adminPassword").value;
+        const status = document.getElementById("adminStatus");
+        const tokenPrev = document.getElementById("adminTokenPreview");
 
-    // ======================= DOKTER (REGISTER) =======================
+        status.textContent = "Proses login...";
+        status.className = "badge bg-warning-subtle text-warning";
 
-    document.getElementById("doctor-register-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (!adminToken) {
-                alert("Harus login admin dulu.");
-                return;
-            }
-            const name = document.getElementById("docName").value;
-            const email = document.getElementById("docEmail").value;
-            const password = document.getElementById("docPassword").value;
-            const phone = document.getElementById("docPhone").value;
-            const specialization = document.getElementById("docSpec").value;
-            const clinic_id = document.getElementById("docClinicId").value;
+        try {
+          const res = await fetch(`${BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          setApiResponse(data);
 
-            try {
-                // 1. register user dokter
-                const resUser = await fetch(`${BASE_URL}/api/auth/register`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name, email, password, phone, role: "doctor"
-                    })
-                });
-                const dataUser = await resUser.json();
-                setApiResponse(dataUser);
-                if (!resUser.ok) {
-                    alert("Register akun dokter gagal");
-                    return;
-                }
+          if (!res.ok) {
+            status.textContent = "Gagal login: " + (data.detail || res.status);
+            status.className = "badge bg-danger-subtle text-danger";
+            adminToken = null;
+            tokenPrev.textContent = "-";
+            return;
+          }
 
-                // 2. simpan profil dokter
-                const resDoc = await fetch(`${BASE_URL}/api/doctors`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Session-Token": adminToken
-                    },
-                    body: JSON.stringify({
-                        name,
-                        specialization,
-                        clinic_id,
-                        phone
-                    })
-                });
-                const dataDoc = await resDoc.json();
-                setApiResponse(dataDoc);
+          adminToken = data.session_token;
+          status.textContent = "Login admin OK";
+          status.className = "badge bg-success-subtle text-success";
+          tokenPrev.textContent = adminToken.substring(0, 25) + "...";
 
-                if (resDoc.ok) {
-                    alert("Dokter berhasil dibuat. Lihat doctor_id di respons.");
-
-                    // AUTO-FILL doctor_id ke form antrean pasien
-                    if (dataDoc.doctor && dataDoc.doctor.id) {
-                        document.getElementById("queueDoctorId").value = dataDoc.doctor.id;
-                    }
-                } else {
-                    alert("Menyimpan data dokter gagal");
-                }
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (dokter)");
-            }
-        });
-
-    // ======================= PASIEN =======================
-
-    document.getElementById("patient-register-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const body = {
-                name: document.getElementById("patName").value,
-                email: document.getElementById("patEmail").value,
-                password: document.getElementById("patPassword").value,
-                phone: document.getElementById("patPhone").value,
-                role: "patient"
-            };
-            try {
-                const res = await fetch(`${BASE_URL}/api/auth/register`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                setApiResponse(data);
-                alert(res.ok ? "Register pasien berhasil" : "Register pasien gagal");
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (register pasien)");
-            }
-        });
-
-    document.getElementById("patient-login-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("patLoginEmail").value;
-            const password = document.getElementById("patLoginPassword").value;
-
-            const status = document.getElementById("patientStatus");
-            const tokenPrev = document.getElementById("patientTokenPreview");
-
-            status.textContent = "Proses login...";
-            status.className = "badge bg-warning-subtle text-warning";
-
-            try {
-                const res = await fetch(`${BASE_URL}/api/auth/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                setApiResponse(data);
-
-                if (!res.ok) {
-                    status.textContent = "Gagal login: " + (data.detail || res.status);
-                    status.className = "badge bg-danger-subtle text-danger";
-                    patientToken = null;
-                    tokenPrev.textContent = "-";
-                    return;
-                }
-
-                patientToken = data.session_token;
-                status.textContent = "Login pasien OK";
-                status.className = "badge bg-success-subtle text-success";
-                tokenPrev.textContent = patientToken.substring(0, 25) + "...";
-            } catch (err) {
-                console.error(err);
-                status.textContent = "Error koneksi";
-                status.className = "badge bg-danger-subtle text-danger";
-            }
-        });
-
-    // ======================= PASIEN – DAFTAR ANTREAN =======================
-
-    document.getElementById("queue-register-form")
-        .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (!patientToken) {
-                alert("Harus login pasien dulu.");
-                return;
-            }
-            const clinic_id = document.getElementById("queueClinicId").value;
-            const doctor_id = document.getElementById("queueDoctorId").value;
-
-            try {
-                const res = await fetch(`${BASE_URL}/api/queues/register`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Session-Token": patientToken
-                    },
-                    body: JSON.stringify({ clinic_id, doctor_id })
-                });
-                const data = await res.json();
-                setApiResponse(data);
-                alert(res.ok
-                    ? "Daftar antrean berhasil. Simpan queue.id dari respons."
-                    : "Gagal mendaftar antrean");
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (daftar antrean)");
-            }
-        });
-
-       // PASIEN – CEK STATUS ANTREAN
-document.getElementById("btnCheckQueue").addEventListener("click", async () => {
-    const qid = document.getElementById("queueCheckInput").value;
-    const tbody = document.getElementById("queueCheckTableBody");
-
-    if (!patientToken) {
-        tbody.innerHTML = `
-            <tr><td colspan="5" class="text-danger text-center py-3">
-                Pasien harus login terlebih dahulu.
-            </td></tr>`;
-        return;
-    }
-
-    if (!qid) {
-        tbody.innerHTML = `
-            <tr><td colspan="5" class="text-warning text-center py-3">
-                Masukkan Queue ID.
-            </td></tr>`;
-        return;
-    }
-
-    const res = await fetch(`${BASE_URL}/api/queues/check/${qid}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${patientToken}`
+          await loadClinics();
+        } catch (err) {
+          console.error(err);
+          status.textContent = "Error koneksi";
+          status.className = "badge bg-danger-subtle text-danger";
         }
-    });
+      });
 
-    const data = await res.json();
+  // =================== KLINIK (ADMIN) ===================
+  document.getElementById("clinic-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!adminToken) {
+          alert("Harus login admin dulu.");
+          return;
+        }
+        const body = {
+          name: document.getElementById("clinicName").value,
+          description: document.getElementById("clinicDesc").value || null
+        };
+        try {
+          const res = await fetch(`${BASE_URL}/api/clinics`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Token": adminToken
+            },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+          setApiResponse(data);
+          alert(res.ok ? "Klinik tersimpan" : "Gagal menyimpan klinik");
+          if (res.ok) await loadClinics();
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (buat klinik)");
+        }
+      });
 
-    // Jika error
-    if (!res.ok) {
-        tbody.innerHTML = `
-            <tr><td colspan="5" class="text-danger text-center py-3">
-                ${data.detail || "Queue tidak ditemukan"}
-            </td></tr>`;
-        return;
+  async function loadClinics() {
+    const tbody = document.getElementById("clinicTableBody");
+    if (!adminToken) {
+      tbody.innerHTML =
+          `<tr><td colspan="2" class="text-muted text-center">Harus login admin dulu.</td></tr>`;
+      return;
     }
+    tbody.innerHTML =
+        `<tr><td colspan="2" class="text-muted text-center">Memuat klinik...</td></tr>`;
+    try {
+      const res = await fetch(`${BASE_URL}/api/clinics`, {
+        headers: { "X-Session-Token": adminToken }
+      });
+      const data = await res.json();
+      setApiResponse(data);
 
-    // Render tabel
-    tbody.innerHTML = `
-        <tr>
-            <td>${data.id}</td>
-            <td>${data.queue_number}</td>
-            <td><span class="badge text-bg-info">${data.status}</span></td>
-            <td>${data.doctor_name || "-"}</td>
-            <td>${data.clinic_name || "-"}</td>
-        </tr>
-    `;
-});
+      if (!res.ok) {
+        tbody.innerHTML =
+            `<tr><td colspan="2" class="text-danger text-center">Gagal memuat klinik: ${data.detail || res.status}</td></tr>`;
+        return;
+      }
 
+      const clinics = data.clinics || [];
+      cachedClinics = clinics;
+      populateClinicDropdowns();
 
+      if (!clinics.length) {
+        tbody.innerHTML =
+            `<tr><td colspan="2" class="text-muted text-center">Belum ada klinik.</td></tr>`;
+        return;
+      }
 
-    // ======================= DOKTER – LOGIN =======================
+      tbody.innerHTML = "";
+      clinics.forEach(c => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${c.id}</td><td>${c.name}</td>`;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML =
+          `<tr><td colspan="2" class="text-danger text-center">Error koneksi.</td></tr>`;
+    }
+  }
 
-    document.getElementById("doctor-login-form")
-        .addEventListener("submit", async (event) => {
-            event.preventDefault();
+  document.getElementById("btnLoadClinics")
+      .addEventListener("click", loadClinics);
 
-            const email = document.getElementById("doctorEmail").value;
-            const password = document.getElementById("doctorPassword").value;
+  // =================== DOKTER REGISTER (ADMIN) ===================
+  document.getElementById("doctor-register-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!adminToken) {
+          alert("Harus login admin dulu.");
+          return;
+        }
+        const name = document.getElementById("docName").value;
+        const email = document.getElementById("docEmail").value;
+        const password = document.getElementById("docPassword").value;
+        const phone = document.getElementById("docPhone").value;
+        const specialization = document.getElementById("docSpec").value;
+        const clinic_id = document.getElementById("docClinicId").value;
 
-            const loginStatus = document.getElementById("loginStatus");
-            loginStatus.textContent = "Proses login...";
-            loginStatus.className = "badge bg-warning-subtle text-warning";
+        if (!clinic_id) {
+          alert("Pilih klinik dulu untuk dokter.");
+          return;
+        }
 
-            try {
-                const res = await fetch(`${BASE_URL}/api/auth/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+        try {
+          // 1. register user dokter
+          const resUser = await fetch(`${BASE_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name, email, password, phone, role: "doctor"
+            })
+          });
+          const dataUser = await resUser.json();
+          setApiResponse(dataUser);
+          if (!resUser.ok) {
+            alert("Register akun dokter gagal");
+            return;
+          }
 
-                const data = await res.json();
-                setApiResponse(data);
+          // 2. simpan profil dokter
+          const resDoc = await fetch(`${BASE_URL}/api/doctors`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Token": adminToken
+            },
+            body: JSON.stringify({
+              name,
+              specialization,
+              clinic_id,
+              phone
+            })
+          });
+          const dataDoc = await resDoc.json();
+          setApiResponse(dataDoc);
 
-                if (!res.ok) {
-                    loginStatus.textContent = "Gagal login: " + (data.detail || res.status);
-                    loginStatus.className = "badge bg-danger-subtle text-danger";
-                    doctorToken = null;
-                    document.getElementById("doctorTokenPreview").innerText = "-";
-                    return;
-                }
+          if (resDoc.ok) {
+            alert("Dokter berhasil dibuat. Lihat doctor_id di respons.");
 
-                // backend mengembalikan session_token
-                doctorToken = data.session_token;
-
-                loginStatus.textContent = "Login dokter berhasil";
-                loginStatus.className = "badge bg-success-subtle text-success";
-
-                if (doctorToken) {
-                    document.getElementById("doctorTokenPreview").innerText =
-                        doctorToken.substring(0, 25) + "...";
-                } else {
-                    document.getElementById("doctorTokenPreview").innerText = "-";
-                }
-
-                await loadQueues();
-            } catch (err) {
-                console.error(err);
-                loginStatus.textContent = "Error koneksi ke server";
-                loginStatus.className = "badge bg-danger-subtle text-danger";
+            if (dataDoc.doctor && dataDoc.doctor.id) {
+              document.getElementById("queueDoctorId").value = dataDoc.doctor.id;
             }
-        });
+          } else {
+            alert("Menyimpan data dokter gagal");
+          }
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (dokter)");
+        }
+      });
 
-    // ======================= DOKTER – COMPLETE QUEUE =======================
+  // =================== PASIEN ===================
+  document.getElementById("patient-register-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const body = {
+          name: document.getElementById("patName").value,
+          email: document.getElementById("patEmail").value,
+          password: document.getElementById("patPassword").value,
+          phone: document.getElementById("patPhone").value,
+          role: "patient"
+        };
+        try {
+          const res = await fetch(`${BASE_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+          setApiResponse(data);
+          alert(res.ok ? "Register pasien berhasil" : "Register pasien gagal");
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (register pasien)");
+        }
+      });
 
-    document.getElementById("complete-queue-form")
-        .addEventListener("submit", async function (event) {
-            event.preventDefault();
+  document.getElementById("patient-login-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("patLoginEmail").value;
+        const password = document.getElementById("patLoginPassword").value;
 
-            if (!doctorToken) {
-                alert("Harus login sebagai dokter dulu.");
-                return;
-            }
+        const status = document.getElementById("patientStatus");
+        const tokenPrev = document.getElementById("patientTokenPreview");
 
-            const queueId = document.getElementById("queueId").value.trim();
-            const reason = document.getElementById("reason").value;
-            const payment_amount = Number(document.getElementById("paymentAmount").value);
-            const mode_of_payment = document.getElementById("modeOfPayment").value;
-            const mode_of_appointment = document.getElementById("modeOfAppointment").value;
+        status.textContent = "Proses login...";
+        status.className = "badge bg-warning-subtle text-warning";
 
-            try {
-                const res = await fetch(`${BASE_URL}/api/queues/${queueId}/complete`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Session-Token": doctorToken
-                    },
-                    body: JSON.stringify({
-                        reason,
-                        payment_amount,
-                        mode_of_payment,
-                        mode_of_appointment
-                    })
-                });
+        try {
+          const res = await fetch(`${BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          setApiResponse(data);
 
-                const data = await res.json();
-                setApiResponse(data);
-                await loadQueues();
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (complete queue)");
-            }
-        });
+          if (!res.ok) {
+            status.textContent = "Gagal login: " + (data.detail || res.status);
+            status.className = "badge bg-danger-subtle text-danger";
+            patientToken = null;
+            tokenPrev.textContent = "-";
+            return;
+          }
 
-    document.getElementById("btnResetForm")
-        .addEventListener("click", function () {
-            document.getElementById("complete-queue-form").reset();
-        });
+          patientToken = data.session_token;
+          status.textContent = "Login pasien OK";
+          status.className = "badge bg-success-subtle text-success";
+          tokenPrev.textContent = patientToken.substring(0, 25) + "...";
+        } catch (err) {
+          console.error(err);
+          status.textContent = "Error koneksi";
+          status.className = "badge bg-danger-subtle text-danger";
+        }
+      });
 
+  // =================== PASIEN – DAFTAR ANTREAN ===================
+  document.getElementById("queue-register-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!patientToken) {
+          alert("Harus login pasien dulu.");
+          return;
+        }
+        const clinic_id = document.getElementById("queueClinicId").value;
+        const doctor_id = document.getElementById("queueDoctorId").value;
 
+        if (!clinic_id) {
+          alert("Pilih klinik dulu.");
+          return;
+        }
 
+        try {
+          const res = await fetch(`${BASE_URL}/api/queues/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Token": patientToken
+            },
+            body: JSON.stringify({ clinic_id, doctor_id })
+          });
+          const data = await res.json();
+          setApiResponse(data);
+          alert(res.ok
+              ? "Daftar antrean berhasil. Simpan queue.id dari respons."
+              : "Gagal mendaftar antrean");
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (daftar antrean)");
+        }
+      });
 
-        // ===================== LOAD KLINIK =====================
-document.getElementById("btnLoadClinics").addEventListener("click", loadClinics);
+  // =================== DOKTER – LOGIN ===================
+  document.getElementById("doctor-login-form")
+      .addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-async function loadClinics() {
-    const res = await fetch(`${BASE_URL}/api/clinics/all`);
-    const clinics = await res.json();
+        const email = document.getElementById("doctorEmail").value;
+        const password = document.getElementById("doctorPassword").value;
 
-    const tableBody = document.getElementById("clinicTableBody");
-    const clinicSelect = document.getElementById("docClinicSelect");
+        const loginStatus = document.getElementById("loginStatus");
+        loginStatus.textContent = "Proses login...";
+        loginStatus.className = "badge bg-warning-subtle text-warning";
 
-    tableBody.innerHTML = "";
-    clinicSelect.innerHTML = `<option value="">-- pilih klinik --</option>`;
+        try {
+          const res = await fetch(`${BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
 
-    clinics.forEach(c => {
-        // Tabel Klinik
-        tableBody.innerHTML += `
-            <tr>
-                <td>${c.id}</td>
-                <td>${c.name}</td>
-            </tr>
-        `;
+          const data = await res.json();
+          setApiResponse(data);
 
-        // Dropdown Dokter
-        clinicSelect.innerHTML += `
-            <option value="${c.id}">${c.name}</option>
-        `;
-    });
-}
+          if (!res.ok) {
+            loginStatus.textContent = "Gagal login: " + (data.detail || res.status);
+            loginStatus.className = "badge bg-danger-subtle text-danger";
+            doctorToken = null;
+            document.getElementById("doctorTokenPreview").innerText = "-";
+            return;
+          }
 
-// ===================== SIMPAN DOKTER =====================
-document.getElementById("doctor-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
+          doctorToken = data.session_token;
 
-    const clinic_id = document.getElementById("docClinicSelect").value;
+          loginStatus.textContent = "Login dokter berhasil";
+          loginStatus.className = "badge bg-success-subtle text-success";
 
-    const body = {
-        name: document.getElementById("docName").value,
-        email: document.getElementById("docEmail").value,
-        password: document.getElementById("docPassword").value,
-        phone: document.getElementById("docPhone").value,
-        specialization: document.getElementById("docSpec").value,
-        clinic_id: clinic_id
-    };
+          if (doctorToken) {
+            document.getElementById("doctorTokenPreview").innerText =
+                doctorToken.substring(0, 25) + "...";
+          } else {
+            document.getElementById("doctorTokenPreview").innerText = "-";
+          }
 
-    const res = await fetch(`${BASE_URL}/api/doctors/register`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + adminToken
-        },
-        body: JSON.stringify(body)
-    });
+          await loadQueues();
+        } catch (err) {
+          console.error(err);
+          loginStatus.textContent = "Error koneksi ke server";
+          loginStatus.className = "badge bg-danger-subtle text-danger";
+        }
+      });
 
-    const data = await res.json();
-    setApiResponse(data);
-
-    // Refresh tabel dokter
-    loadDoctors();
-});
-
-// ===================== LOAD TABEL DOKTER =====================
-async function loadDoctors() {
-    const res = await fetch(`${BASE_URL}/api/doctors/all`);
-    const doctors = await res.json();
-
-    const table = document.getElementById("doctorTableBody");
-    table.innerHTML = "";
-
-    doctors.forEach(d => {
-        table.innerHTML += `
-            <tr>
-                <td>${d.id}</td>
-                <td>${d.name}</td>
-                <td>${d.clinic_name || d.clinic_id}</td>
-            </tr>
-        `;
-    });
-}
-
-
-
-    // ======================= DOKTER – CALL QUEUE =======================
-
-    document.getElementById("btnCallQueue")
-        .addEventListener("click", async () => {
-            if (!doctorToken) {
-                alert("Harus login dokter dulu.");
-                return;
-            }
-            const queueId = document.getElementById("queueId").value.trim();
-            if (!queueId) {
-                alert("Isi Queue ID dulu (klik dari tabel).");
-                return;
-            }
-
-            try {
-                const res = await fetch(`${BASE_URL}/api/queues/${queueId}/call`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Session-Token": doctorToken
-                    }
-                });
-                const data = await res.json();
-                setApiResponse(data);
-                await loadQueues();
-            } catch (err) {
-                console.error(err);
-                setApiResponse("Error koneksi (call queue)");
-            }
-        });
-
-    // ======================= DOKTER – LIST QUEUES =======================
-
-    async function loadQueues() {
-        const tbody = document.getElementById("queueTableBody");
+  // =================== DOKTER – COMPLETE QUEUE ===================
+  document.getElementById("complete-queue-form")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
 
         if (!doctorToken) {
-            tbody.innerHTML =
-                `<tr><td colspan="5" class="text-muted text-center">Harus login dokter dulu.</td></tr>`;
-            return;
+          alert("Harus login sebagai dokter dulu.");
+          return;
         }
 
-        tbody.innerHTML =
-            `<tr><td colspan="5" class="text-muted text-center">Memuat data antrean...</td></tr>`;
+        const queueId = document.getElementById("queueId").value.trim();
+        const reason = document.getElementById("reason").value;
+        const payment_amount = Number(document.getElementById("paymentAmount").value);
+        const mode_of_payment = document.getElementById("modeOfPayment").value;
+        const mode_of_appointment = document.getElementById("modeOfAppointment").value;
 
         try {
-            const res = await fetch(`${BASE_URL}/api/queues`, {
-                method: "GET",
-                headers: {
-                    "X-Session-Token": doctorToken
-                }
-            });
+          const res = await fetch(`${BASE_URL}/api/queues/${queueId}/complete`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Token": doctorToken
+            },
+            body: JSON.stringify({
+              reason,
+              payment_amount,
+              mode_of_payment,
+              mode_of_appointment
+            })
+          });
 
-            const data = await res.json();
-            setApiResponse(data);
+          const data = await res.json();
+          setApiResponse(data);
+          await loadQueues();
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (complete queue)");
+        }
+      });
 
-            if (!res.ok) {
-                tbody.innerHTML =
-                    `<tr><td colspan="5" class="text-danger text-center">Gagal memuat antrean: ${data.detail || res.status}</td></tr>`;
-                return;
+  document.getElementById("btnResetForm")
+      .addEventListener("click", function () {
+        document.getElementById("complete-queue-form").reset();
+      });
+
+  // =================== DOKTER – CALL QUEUE ===================
+  document.getElementById("btnCallQueue")
+      .addEventListener("click", async () => {
+        if (!doctorToken) {
+          alert("Harus login dokter dulu.");
+          return;
+        }
+        const queueId = document.getElementById("queueId").value.trim();
+        if (!queueId) {
+          alert("Isi Queue ID dulu (klik dari tabel).");
+          return;
+        }
+
+        try {
+          const res = await fetch(`${BASE_URL}/api/queues/${queueId}/call`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-Token": doctorToken
             }
+          });
+          const data = await res.json();
+          setApiResponse(data);
+          await loadQueues();
+        } catch (err) {
+          console.error(err);
+          setApiResponse("Error koneksi (call queue)");
+        }
+      });
 
-            const queues = data.queues || [];
-            if (!queues.length) {
-                tbody.innerHTML =
-                    `<tr><td colspan="5" class="text-muted text-center">Tidak ada antrean.</td></tr>`;
-                return;
-            }
+  // =================== DOKTER – LIST QUEUES ===================
+  async function loadQueues() {
+    const tbody = document.getElementById("queueTableBody");
 
-            tbody.innerHTML = "";
-            queues.forEach(q => {
-                const tr = document.createElement("tr");
-                tr.className = "queue-row";
+    if (!doctorToken) {
+      tbody.innerHTML =
+          `<tr><td colspan="5" class="text-muted text-center">Harus login dokter dulu.</td></tr>`;
+      return;
+    }
 
-                tr.innerHTML = `
+    tbody.innerHTML =
+        `<tr><td colspan="5" class="text-muted text-center">Memuat data antrean...</td></tr>`;
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/queues`, {
+        method: "GET",
+        headers: { "X-Session-Token": doctorToken }
+      });
+
+      const data = await res.json();
+      setApiResponse(data);
+
+      if (!res.ok) {
+        tbody.innerHTML =
+            `<tr><td colspan="5" class="text-danger text-center">Gagal memuat antrean: ${data.detail || res.status}</td></tr>`;
+        return;
+      }
+
+      const queues = data.queues || [];
+      if (!queues.length) {
+        tbody.innerHTML =
+            `<tr><td colspan="5" class="text-muted text-center">Tidak ada antrean.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      queues.forEach(q => {
+        const tr = document.createElement("tr");
+        tr.className = "queue-row";
+        tr.innerHTML = `
                     <td class="text-truncate" style="max-width: 220px;">${q.id}</td>
                     <td>${q.queue_number}</td>
                     <td>${q.patient_name}</td>
                     <td>${q.clinic_name}</td>
                     <td><span class="badge badge-status text-bg-secondary">${q.status}</span></td>
                 `;
-
-                tr.addEventListener("click", () => {
-                    document.getElementById("queueId").value = q.id;
-                });
-
-                tbody.appendChild(tr);
-            });
-        } catch (err) {
-            console.error(err);
-            tbody.innerHTML =
-                `<tr><td colspan="5" class="text-danger text-center">Error koneksi ke server.</td></tr>`;
-        }
+        tr.addEventListener("click", () => {
+          document.getElementById("queueId").value = q.id;
+          switchPage("doctor");
+        });
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML =
+          `<tr><td colspan="5" class="text-danger text-center">Error koneksi ke server.</td></tr>`;
     }
+  }
 
-    document.getElementById("btnLoadQueues")
-        .addEventListener("click", loadQueues);
+  document.getElementById("btnLoadQueues")
+      .addEventListener("click", loadQueues);
+      // ===================== REALTIME DASHBOARD =====================
+async function loadDashboardStats() {
+    try {
+        const qres = await fetch(`${BASE_URL}/api/queues`, {
+            headers: { "X-Session-Token": adminToken || doctorToken || patientToken || "" }
+        });
+
+        const qdata = await qres.json();
+        const queues = qdata.queues || [];
+
+        document.getElementById("statTotalQueues").innerText = queues.length;
+
+        // STATUS VERSI INDONESIA (yang backend kamu pakai)
+        document.getElementById("statWaiting").innerText =
+            queues.filter(q => q.status === "menunggu").length;
+
+        document.getElementById("statCompleted").innerText =
+            queues.filter(q => q.status === "selesai").length;
+
+        // Dokter aktif
+        const dres = await fetch(`${BASE_URL}/api/doctors?is_available=true`);
+        const ddata = await dres.json();
+        document.getElementById("statActiveDoctors").innerText = ddata.total;
+
+    } catch (err) {
+        console.error("Realtime error:", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadDashboardStats);
+setInterval(loadDashboardStats, 10000);
+
+
 </script>
-
 
 
 </body>
