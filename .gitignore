@@ -1,12 +1,15 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 
-# Virtual environment
+# Virtual env
 venv/
 .venv/
 
-# Python cache
+# Python
 __pycache__/
 *.pyc
+
+# Env
+.env
 
 # Node
 node_modules/
