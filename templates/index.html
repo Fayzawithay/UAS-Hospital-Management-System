@@ -904,16 +904,15 @@
               <form id="queue-register-form" class="mb-3">
                 <div class="mb-2">
                   <label class="form-label">Klinik</label>
-                  <select class="form-select" id="queueClinicId" required>
+                  <select class="form-select" id="queueClinicId" required onchange="loadDoctorsByClinic(this.value)">
                     <option value="">Pilih klinik...</option>
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">doctor_id</label>
-                  <input type="text" class="form-control" id="queueDoctorId" placeholder="doctor-001" required>
-                  <div class="form-text">
-                    Bisa diambil dari respons pembuatan dokter (Admin).
-                  </div>
+                    <label class="form-label">Dokter</label>
+                    <select class="form-select" id="queueDoctorId" required>
+                  <option value="">Pilih dokter...</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-success w-100">
                   Daftar Antrean
@@ -1138,6 +1137,43 @@
   }
 
   document.addEventListener("DOMContentLoaded", loadPublicClinicsForDropdowns);
+
+  // =================== LOAD DOCTORS BY CLINIC ===================
+
+async function loadDoctorsByClinic(clinicId) {
+  console.log("KLINIK DIPILIH:", clinicId);
+  const select = document.getElementById("queueDoctorId");
+  select.innerHTML = `<option value="">Loading dokter...</option>`;
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/doctors?clinic_id=${clinicId}`);
+    const data = await res.json();
+    console.log("API RESPONSE:", data);
+
+
+    const doctors = data.doctors;
+
+    if (!Array.isArray(doctors) || doctors.length === 0) {
+      select.innerHTML = `<option value="">Dokter tidak tersedia</option>`;
+      return;
+    }
+
+    select.innerHTML = `<option value="">Pilih dokter...</option>`;
+    doctors.forEach(doc => {
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.textContent = `${doc.name} (${doc.specialization || "Dokter"})`;
+      select.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error(err);
+    select.innerHTML = `<option value="">Gagal load dokter</option>`;
+  }
+}
+
+
+
 
   // =================== ADMIN ===================
   document.getElementById("admin-register-form")
