@@ -13,7 +13,7 @@ DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
 # Tanpa password
-DATABASE_URL = "mysql+pymysql://root:@localhost/myhospital"
+DATABASE_URL = "mysql+pymysql://root:@localhost/hospital_app"
 # kalau MySQL pakai password:
 # DATABASE_URL = "mysql+pymysql://root:PASSWORD@localhost:3306/myhospital"
 
