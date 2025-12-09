@@ -25,10 +25,7 @@ router = APIRouter(prefix="/statistics", tags=["Statistics"])
 # ===================== HELPER =====================
 
 def _parse_iso(dt_str: Optional[str]) -> Optional[datetime]:
-    """
-    Parse string ISO (misal dari datetime.isoformat()) menjadi datetime.
-    Kalau gagal / None / kosong, return None.
-    """
+
     if not dt_str:
         return None
     dt_str = dt_str.strip()
@@ -48,10 +45,7 @@ def _parse_iso(dt_str: Optional[str]) -> Optional[datetime]:
 
 
 def _month_key_from_string(date_str: Optional[str]) -> Optional[str]:
-    """
-    Ambil key bulan "YYYY-MM" dari string tanggal (visit_date) yang disimpan sebagai ISO string.
-    Kalau format aneh, return None.
-    """
+
     if not date_str:
         return None
     date_str = date_str.strip()
@@ -69,12 +63,12 @@ def financial_summary(
     current_user: User = Depends(require_doctor_or_admin),
 ):
     """
-    Ringkasan finansial berbasis tabel visits (VisitHistoryDB).
+    Ringkasan finansial berbasis tabel visits.
 
     Kolom yang dipakai:
       - payment_amount (Float)
-      - mode_of_payment (string: 'Cash', 'BPJS', 'Insurance', dll)
-      - visit_date (string ISO, kita ambil "YYYY-MM" untuk per-bulan)
+      - mode_of_payment (string: 'Cash', 'QRIS', 'Transfer')
+      - visit_date (YYYY-MM)
     """
 
     # total uang & jumlah visit
@@ -168,8 +162,8 @@ def operational_summary(
 ):
     """
     Ringkasan operasional dari:
-      - QueueDB (antrian)
-      - VisitHistoryDB (riwayat kunjungan)
+      - Queue (antrian)
+      - Visit (riwayat kunjungan)
     """
 
     # ---- Status antrian ----
@@ -284,9 +278,8 @@ def patient_summary(
     current_user: User = Depends(require_doctor_or_admin),
 ):
     """
-    Ringkasan pasien & pola kunjungan, berbasis VisitHistoryDB.
+    Ringkasan pasien & pola kunjungan, berbasis Visit.
 
-    Karena UserDB tidak punya DOB / gender, fokus ke:
       - jumlah pasien unik (distinct patient_id di visits)
       - top pasien berdasarkan frekuensi visit
       - distribusi mode_of_appointment
