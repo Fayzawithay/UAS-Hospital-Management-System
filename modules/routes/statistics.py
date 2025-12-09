@@ -1,200 +1,381 @@
 # modules/routes/statistics.py
-from fastapi import APIRouter, Depends, HTTPException
-from typing import Optional
-from datetime import date
+
+from datetime import datetime
+from typing import Optional, Dict, Any, List
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, case, Integer
+from sqlalchemy import func
 
-# sesuaikan import path get_db dengan proyekmu
-from dependency import get_db  # <-- jika get_db() ada di deps.py
+from dependency import get_db
 from modules.routes.auth import require_doctor_or_admin
-from modules.schema.schemas import User  # <-- auth user schema
+from modules.schema.schemas import User  # current_user schema (Pydantic)
 
-# --- ORM models: sesuaikan path import sesuai struktur project ---
-# If your models are in models.py, import from there; if in modules.models, change path.
-try:
-    from models import Patient, Doctor, Appointment, Treatment, Billing, Record  # <-- adjust
-except Exception:
-    # fallback: try modules.models or modules.db_models
+from modules.db_models import (
+    UserDB,
+    DoctorDB,
+    ClinicDB,
+    QueueDB,
+    VisitHistoryDB,
+)
+
+router = APIRouter(prefix="/statistics", tags=["Statistics"])
+
+
+# ===================== HELPER =====================
+
+def _parse_iso(dt_str: Optional[str]) -> Optional[datetime]:
+
+    if not dt_str:
+        return None
+    dt_str = dt_str.strip()
+    if not dt_str:
+        return None
     try:
-        from modules.models import Patient, Doctor, Appointment, Treatment, Billing, Record
+        # contoh: "2025-12-10T13:45:00.123456" atau "2025-12-10T13:45:00"
+        return datetime.fromisoformat(dt_str)
     except Exception:
-        # if you keep models in modules.db_models (only some tables), import what exists
-        from modules.db_models import VisitHistoryDB as VisitHistory, ClinicDB as Clinic
-        Patient = None  # mark as unavailable
+        # handle yang pakai 'Z' di belakang: "2025-12-10T13:45:00Z"
+        if dt_str.endswith("Z"):
+            try:
+                return datetime.fromisoformat(dt_str[:-1])
+            except Exception:
+                return None
+        return None
 
-router = APIRouter()
 
+def _month_key_from_string(date_str: Optional[str]) -> Optional[str]:
+
+    if not date_str:
+        return None
+    date_str = date_str.strip()
+    if len(date_str) < 7:
+        return None
+    # asumsi format mulai dengan "YYYY-MM-..."
+    return date_str[:7]
+
+
+# ===================== 1. FINANCIAL SUMMARY =====================
 
 @router.get("/financial-summary")
-def financial_summary(db: Session = Depends(get_db),
-                      current_user: User = Depends(require_doctor_or_admin)):
+def financial_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_doctor_or_admin),
+):
     """
-    Financial aggregates using ORM queries (MySQL-compatible).
-    Requires Billing and Treatment ORM models.
+    Ringkasan finansial berbasis tabel visits.
+
+    Kolom yang dipakai:
+      - payment_amount (Float)
+      - mode_of_payment (string: 'Cash', 'QRIS', 'Transfer')
+      - visit_date (YYYY-MM)
     """
-    # totals from billing
+
+    # total uang & jumlah visit
     total_q = db.query(
-        func.coalesce(func.sum(Billing.amount), 0).label("total_billed"),
-        func.coalesce(func.sum(case([(Billing.payment_status == "Paid", Billing.amount)], else_=0)), 0).label("total_paid"),
-        func.coalesce(func.sum(case([(Billing.payment_status != "Paid", Billing.amount)], else_=0)), 0).label("outstanding")
+        func.coalesce(func.sum(VisitHistoryDB.payment_amount), 0).label("total_amount"),
+        func.count(VisitHistoryDB.id).label("total_visits"),
     ).one()
 
-    total_billed = float(total_q.total_billed or 0)
-    total_paid = float(total_q.total_paid or 0)
-    outstanding = float(total_q.outstanding or 0)
+    total_amount = float(total_q.total_amount or 0)
+    total_visits = int(total_q.total_visits or 0)
 
-    # treatments aggregates
-    treat_q = db.query(
-        func.coalesce(func.sum(Treatment.cost), 0).label("treatment_cost_total"),
-        func.coalesce(func.avg(Treatment.cost), 0).label("avg_treatment_cost")
-    ).one()
-    treatment_cost_total = float(treat_q.treatment_cost_total or 0)
-    avg_treatment_cost = float(treat_q.avg_treatment_cost or 0)
+    # revenue per mode_of_payment
+    by_payment_rows = (
+        db.query(
+            VisitHistoryDB.mode_of_payment,
+            func.coalesce(func.sum(VisitHistoryDB.payment_amount), 0).label("total"),
+            func.count(VisitHistoryDB.id).label("count"),
+        )
+        .group_by(VisitHistoryDB.mode_of_payment)
+        .all()
+    )
 
-    # monthly revenue (paid) - using function DATE_FORMAT via func (works with MySQL)
-    # SQLAlchemy generic approach: use func.date_format
-    monthly = db.query(
-        func.date_format(Billing.bill_date, "%Y-%m").label("month"),
-        func.sum(Billing.amount).label("revenue")
-    ).filter(Billing.payment_status == "Paid", Billing.bill_date.isnot(None))\
-     .group_by(func.date_format(Billing.bill_date, "%Y-%m"))\
-     .order_by(func.date_format(Billing.bill_date, "%Y-%m")).all()
+    revenue_by_payment_mode: List[Dict[str, Any]] = []
+    for r in by_payment_rows:
+        revenue_by_payment_mode.append(
+            {
+                "mode_of_payment": r.mode_of_payment or "Unknown",
+                "total_amount": float(r.total or 0),
+                "visit_count": int(r.count or 0),
+            }
+        )
 
-    monthly_revenue = [{"month": m.month, "revenue": float(m.revenue)} for m in monthly]
+    # revenue per mode_of_appointment
+    by_appointment_rows = (
+        db.query(
+            VisitHistoryDB.mode_of_appointment,
+            func.coalesce(func.sum(VisitHistoryDB.payment_amount), 0).label("total"),
+            func.count(VisitHistoryDB.id).label("count"),
+        )
+        .group_by(VisitHistoryDB.mode_of_appointment)
+        .all()
+    )
+
+    revenue_by_appointment_mode: List[Dict[str, Any]] = []
+    for r in by_appointment_rows:
+        revenue_by_appointment_mode.append(
+            {
+                "mode_of_appointment": r.mode_of_appointment or "Unknown",
+                "total_amount": float(r.total or 0),
+                "visit_count": int(r.count or 0),
+            }
+        )
+
+    # monthly revenue (kita hitung di Python karena visit_date = String)
+    visits = db.query(VisitHistoryDB.visit_date, VisitHistoryDB.payment_amount).all()
+
+    monthly_map: Dict[str, Dict[str, Any]] = {}
+    for v_date, amount in visits:
+        month_key = _month_key_from_string(v_date)
+        if not month_key:
+            continue
+        if month_key not in monthly_map:
+            monthly_map[month_key] = {"revenue": 0.0, "visit_count": 0}
+        monthly_map[month_key]["revenue"] += float(amount or 0)
+        monthly_map[month_key]["visit_count"] += 1
+
+    monthly_revenue = [
+        {
+            "month": m,
+            "revenue": round(data["revenue"], 2),
+            "visit_count": data["visit_count"],
+        }
+        for m, data in sorted(monthly_map.items())
+    ]
 
     return {
-        "total_billed": round(total_billed, 2),
-        "total_paid": round(total_paid, 2),
-        "outstanding": round(outstanding, 2),
-        "treatment_cost_total": round(treatment_cost_total, 2),
-        "avg_treatment_cost": round(avg_treatment_cost, 2),
-        "monthly_revenue": monthly_revenue
+        "total_amount": round(total_amount, 2),
+        "total_visits": total_visits,
+        "revenue_by_payment_mode": revenue_by_payment_mode,
+        "revenue_by_appointment_mode": revenue_by_appointment_mode,
+        "monthly_revenue": monthly_revenue,
     }
 
+
+# ===================== 2. OPERATIONAL SUMMARY =====================
 
 @router.get("/operational-summary")
-def operational_summary(db: Session = Depends(get_db),
-                        current_user: User = Depends(require_doctor_or_admin)):
+def operational_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_doctor_or_admin),
+):
     """
-    Operational metrics from Appointment ORM.
+    Ringkasan operasional dari:
+      - Queue (antrian)
+      - Visit (riwayat kunjungan)
     """
-    # status counts
-    status_rows = db.query(Appointment.status, func.count(Appointment.appointment_id)).group_by(Appointment.status).all()
-    status_counts = {r[0]: int(r[1]) for r in status_rows}
-    total_appointments = sum(status_counts.values()) if status_counts else 0
-    no_show = status_counts.get("No-show", 0)
-    no_show_rate = round((no_show / total_appointments) * 100, 2) if total_appointments > 0 else 0.0
 
-    # top doctors by appointment count
-    top_doctors_q = db.query(Appointment.doctor_id, func.count(Appointment.appointment_id).label("cnt"))\
-                      .group_by(Appointment.doctor_id).order_by(func.count(Appointment.appointment_id).desc()).limit(10).all()
-    top_doctors = [{"doctor_id": r.doctor_id, "appointments": int(r.cnt)} for r in top_doctors_q]
+    # ---- Status antrian ----
+    status_rows = (
+        db.query(QueueDB.status, func.count(QueueDB.id))
+        .group_by(QueueDB.status)
+        .all()
+    )
+    status_counts: Dict[str, int] = {
+        (row[0] or "Unknown"): int(row[1]) for row in status_rows
+    }
 
-    # monthly visits
-    monthly_q = db.query(func.date_format(Appointment.appointment_date, "%Y-%m").label("month"),
-                         func.count(Appointment.appointment_id).label("visits"))\
-                  .filter(Appointment.appointment_date.isnot(None))\
-                  .group_by(func.date_format(Appointment.appointment_date, "%Y-%m"))\
-                  .order_by(func.date_format(Appointment.appointment_date, "%Y-%m")).all()
-    monthly_visits = [{"month": r.month, "visits": int(r.visits)} for r in monthly_q]
+    total_queues = sum(status_counts.values())
+    # di db_models: status: "menunggu", "sedang_dilayani", "selesai", "dibatalkan"
+    completed = status_counts.get("selesai", 0)
+
+    # misal kamu anggap "No-show" = dibatalkan:
+    no_show = status_counts.get("dibatalkan", 0)
+    no_show_rate = round((no_show / total_queues) * 100, 2) if total_queues > 0 else 0.0
+
+    # ---- Waktu tunggu & durasi pelayanan (dihitung di Python) ----
+    queues = db.query(
+        QueueDB.registration_time,
+        QueueDB.called_time,
+        QueueDB.service_start_time,
+        QueueDB.service_end_time,
+    ).all()
+
+    wait_seconds_list: List[float] = []
+    service_seconds_list: List[float] = []
+
+    for reg_str, called_str, start_str, end_str in queues:
+        reg = _parse_iso(reg_str)
+        start = _parse_iso(start_str)
+        end = _parse_iso(end_str)
+
+        # waktu tunggu: dari registration ke service_start
+        if reg and start and start >= reg:
+            wait_seconds_list.append((start - reg).total_seconds())
+
+        # durasi pelayanan: dari service_start ke service_end
+        if start and end and end >= start:
+            service_seconds_list.append((end - start).total_seconds())
+
+    def _summary_seconds_to_minutes(values: List[float]) -> Dict[str, Optional[float]]:
+        if not values:
+            return {"avg": None, "min": None, "max": None}
+        avg_sec = sum(values) / len(values)
+        return {
+            "avg": round(avg_sec / 60.0, 2),
+            "min": round(min(values) / 60.0, 2),
+            "max": round(max(values) / 60.0, 2),
+        }
+
+    wait_summary = _summary_seconds_to_minutes(wait_seconds_list)
+    service_summary = _summary_seconds_to_minutes(service_seconds_list)
+
+    # ---- Monthly visits (dari VisitHistoryDB.visit_date) ----
+    visits_dates = db.query(VisitHistoryDB.visit_date).all()
+    monthly_visits_map: Dict[str, int] = {}
+    for (v_date,) in visits_dates:
+        month_key = _month_key_from_string(v_date)
+        if not month_key:
+            continue
+        monthly_visits_map[month_key] = monthly_visits_map.get(month_key, 0) + 1
+
+    monthly_visits = [
+        {"month": m, "visits": cnt}
+        for m, cnt in sorted(monthly_visits_map.items())
+    ]
+
+    # ---- Top dokter berdasarkan jumlah visit ----
+    top_doctors_q = (
+        db.query(
+            VisitHistoryDB.doctor_id,
+            VisitHistoryDB.doctor_name,
+            func.count(VisitHistoryDB.id).label("visit_count"),
+        )
+        .group_by(VisitHistoryDB.doctor_id, VisitHistoryDB.doctor_name)
+        .order_by(func.count(VisitHistoryDB.id).desc())
+        .limit(10)
+        .all()
+    )
+
+    top_doctors = [
+        {
+            "doctor_id": r.doctor_id,
+            "doctor_name": r.doctor_name,
+            "visit_count": int(r.visit_count or 0),
+        }
+        for r in top_doctors_q
+    ]
 
     return {
-        "total_appointments": int(total_appointments),
+        "total_queues": int(total_queues),
         "status_counts": status_counts,
+        "completed_queues": int(completed),
         "no_show_count": int(no_show),
         "no_show_rate_percent": no_show_rate,
-        "top_doctors_by_appointments": top_doctors,
-        "monthly_visits": monthly_visits
+        "wait_time_minutes": wait_summary,      # {avg, min, max}
+        "service_time_minutes": service_summary,  # {avg, min, max}
+        "monthly_visits": monthly_visits,
+        "top_doctors_by_visits": top_doctors,
     }
 
 
+# ===================== 3. PATIENT / VISITS SUMMARY =====================
+
 @router.get("/patient-summary")
-def patient_summary(db: Session = Depends(get_db),
-                    current_user: User = Depends(require_doctor_or_admin)):
+def patient_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_doctor_or_admin),
+):
     """
-    Patient demographics + visits using ORM models.
-    Requires Patient and Appointment ORM models.
-    """
-    # Age stats: get count, avg, min, max via TIMESTAMPDIFF
-    age_stats_q = db.query(
-        func.count(Patient.patient_id).label("cnt"),
-        func.avg(func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate())).label("mean_age"),
-        func.min(func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate())).label("min_age"),
-        func.max(func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate())).label("max_age")
-    ).filter(Patient.date_of_birth.isnot(None)).one()
+    Ringkasan pasien & pola kunjungan, berbasis Visit.
 
-    age_stats = {}
-    if age_stats_q and age_stats_q.cnt and age_stats_q.cnt > 0:
-        # median requires fetching list (MySQL lacks percentile easily)
-        ages_rows = db.query(func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate()).label("age"))\
-                      .filter(Patient.date_of_birth.isnot(None)).order_by("age").all()
-        ages = [int(r.age) for r in ages_rows if r.age is not None]
-        median = None
-        if ages:
-            n = len(ages)
-            if n % 2 == 1:
-                median = float(ages[n//2])
-            else:
-                median = float((ages[n//2 - 1] + ages[n//2]) / 2.0)
-        age_stats = {
-            "count": int(age_stats_q.cnt),
-            "mean": float(round(age_stats_q.mean_age, 2)) if age_stats_q.mean_age else None,
-            "min": int(age_stats_q.min_age) if age_stats_q.min_age is not None else None,
-            "max": int(age_stats_q.max_age) if age_stats_q.max_age is not None else None,
-            "median": median
+      - jumlah pasien unik (distinct patient_id di visits)
+      - top pasien berdasarkan frekuensi visit
+      - distribusi mode_of_appointment
+      - distribusi visit per klinik
+      - distribusi visit per dokter
+    """
+
+    # ---- total pasien unik yang pernah visit ----
+    total_patients = (
+        db.query(func.count(func.distinct(VisitHistoryDB.patient_id))).scalar() or 0
+    )
+
+    # ---- top pasien by visit_count ----
+    top_patients_q = (
+        db.query(
+            VisitHistoryDB.patient_id,
+            VisitHistoryDB.patient_name,
+            func.count(VisitHistoryDB.id).label("visit_count"),
+        )
+        .group_by(VisitHistoryDB.patient_id, VisitHistoryDB.patient_name)
+        .order_by(func.count(VisitHistoryDB.id).desc())
+        .limit(10)
+        .all()
+    )
+
+    top_patients = [
+        {
+            "patient_id": r.patient_id,
+            "patient_name": r.patient_name,
+            "visit_count": int(r.visit_count or 0),
         }
+        for r in top_patients_q
+    ]
 
-    # gender counts
-    gender_rows = db.query(Patient.gender, func.count(Patient.patient_id)).group_by(Patient.gender).all()
-    gender_counts = {r[0]: int(r[1]) for r in gender_rows}
+    # ---- visits per mode_of_appointment ----
+    mode_rows = (
+        db.query(
+            VisitHistoryDB.mode_of_appointment,
+            func.count(VisitHistoryDB.id).label("visit_count"),
+        )
+        .group_by(VisitHistoryDB.mode_of_appointment)
+        .all()
+    )
 
-    # visits by gender (join)
-    visits_gender_rows = db.query(Patient.gender, func.count(Appointment.appointment_id).label("visits"))\
-                           .join(Appointment, Appointment.patient_id == Patient.patient_id, isouter=True)\
-                           .group_by(Patient.gender).all()
-    visits_by_gender = {r[0]: int(r[1]) for r in visits_gender_rows}
+    visits_by_mode_of_appointment = [
+        {
+            "mode_of_appointment": r.mode_of_appointment or "Unknown",
+            "visit_count": int(r.visit_count or 0),
+        }
+        for r in mode_rows
+    ]
 
-    # monthly visits by age group: produce buckets via CASE expressions in SQL
-    age_group_case = case([
-        (func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate()).between(0,17), "0-17"),
-        (func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate()).between(18,30), "18-30"),
-        (func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate()).between(31,45), "31-45"),
-        (func.timestampdiff(func.literal_column('YEAR'), Patient.date_of_birth, func.curdate()).between(46,60), "46-60")
-    ], else_="60+")
+    # ---- visits per klinik ----
+    clinic_rows = (
+        db.query(
+            VisitHistoryDB.clinic_id,
+            VisitHistoryDB.clinic_name,
+            func.count(VisitHistoryDB.id).label("visit_count"),
+        )
+        .group_by(VisitHistoryDB.clinic_id, VisitHistoryDB.clinic_name)
+        .all()
+    )
 
-    subq = db.query(
-        func.date_format(Appointment.appointment_date, "%Y-%m").label("month"),
-        age_group_case.label("age_group"),
-        func.count(Appointment.appointment_id).label("cnt")
-    ).join(Patient, Appointment.patient_id == Patient.patient_id, isouter=True)\
-     .filter(Appointment.appointment_date.isnot(None), Patient.date_of_birth.isnot(None))\
-     .group_by(func.date_format(Appointment.appointment_date, "%Y-%m"), age_group_case).subquery()
+    visits_by_clinic = [
+        {
+            "clinic_id": r.clinic_id,
+            "clinic_name": r.clinic_name,
+            "visit_count": int(r.visit_count or 0),
+        }
+        for r in clinic_rows
+    ]
 
-    # pivot-like aggregation
-    monthly_age_group_rows = db.query(
-        subq.c.month,
-        func.sum(case([(subq.c.age_group == "0-17", subq.c.cnt)], else_=0)).label("0_17"),
-        func.sum(case([(subq.c.age_group == "18-30", subq.c.cnt)], else_=0)).label("18_30"),
-        func.sum(case([(subq.c.age_group == "31-45", subq.c.cnt)], else_=0)).label("31_45"),
-        func.sum(case([(subq.c.age_group == "46-60", subq.c.cnt)], else_=0)).label("46_60"),
-        func.sum(case([(subq.c.age_group == "60+", subq.c.cnt)], else_=0)).label("60_plus")
-    ).group_by(subq.c.month).order_by(subq.c.month).all()
+    # ---- visits per dokter ----
+    doctor_rows = (
+        db.query(
+            VisitHistoryDB.doctor_id,
+            VisitHistoryDB.doctor_name,
+            func.count(VisitHistoryDB.id).label("visit_count"),
+        )
+        .group_by(VisitHistoryDB.doctor_id, VisitHistoryDB.doctor_name)
+        .all()
+    )
 
-    monthly_age_group = []
-    for r in monthly_age_group_rows:
-        monthly_age_group.append({
-            "month": r[0],
-            "0-17": int(r[1]),
-            "18-30": int(r[2]),
-            "31-45": int(r[3]),
-            "46-60": int(r[4]),
-            "60+": int(r[5])
-        })
+    visits_by_doctor = [
+        {
+            "doctor_id": r.doctor_id,
+            "doctor_name": r.doctor_name,
+            "visit_count": int(r.visit_count or 0),
+        }
+        for r in doctor_rows
+    ]
 
     return {
-        "age_stats": age_stats,
-        "gender_counts": gender_counts,
-        "visits_by_gender": visits_by_gender,
-        "monthly_visits_by_age_group": monthly_age_group
+        "total_patients": int(total_patients),
+        "top_patients_by_visits": top_patients,
+        "visits_by_mode_of_appointment": visits_by_mode_of_appointment,
+        "visits_by_clinic": visits_by_clinic,
+        "visits_by_doctor": visits_by_doctor,
     }
