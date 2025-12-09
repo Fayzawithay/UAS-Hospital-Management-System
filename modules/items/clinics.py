@@ -10,7 +10,7 @@ from modules.db_models import ClinicDB             # SQLAlchemy model
 from database import SessionLocal
 
 # Dummy dict supaya import lama di routes/statistics.py ("clinics_db") tidak error.
-# Sekarang tidak dipakai untuk penyimpanan utama, hanya biar kompatibel.
+# Sekarang tidak dipakai untuk penyimpanan utama, hanya agar kompatibel.
 clinics_db: Dict[str, Clinic] = {}
 
 
@@ -60,7 +60,7 @@ def create_clinic(name: str, description: Optional[str] = None) -> Clinic:
 
         clinic_schema = _to_schema(db_clinic)
 
-        # Optional: sync ke clinics_db biar kalau ada kode lama yang baca ini nggak kosong banget
+        # Optional: sync ke clinics_db agar kalau ada kode lama yang baca ini nggak kosong banget
         clinics_db[clinic_schema.id] = clinic_schema
 
         return clinic_schema
