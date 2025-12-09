@@ -22,7 +22,7 @@ class QueueStatus(str, Enum):
 # ================= CORE MODEL =================
 
 class User(BaseModel):
-    id: str
+    id: int
     name: str
     email: EmailStr
     phone: str
@@ -34,7 +34,7 @@ class User(BaseModel):
 
 
 class Clinic(BaseModel):
-    id: str
+    id: int
     name: str
     description: Optional[str] = None
     is_active: bool = True
@@ -44,7 +44,7 @@ class Clinic(BaseModel):
 
 
 class Doctor(BaseModel):
-    id: str
+    id: int
     name: str
     specialization: str
     clinic_id: str
@@ -57,7 +57,7 @@ class Doctor(BaseModel):
 
 
 class Queue(BaseModel):
-    id: str
+    id: int
     queue_number: str
     patient_id: str
     patient_name: str
@@ -75,7 +75,7 @@ class Queue(BaseModel):
 
 # =============== VISIT HISTORY (ALA KAGGLE) =================
 class VisitHistory(BaseModel):
-    id: str                # record id
+    id: int             # record id
     queue_id: str
     patient_id: str
     patient_name: str
